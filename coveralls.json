@@ -1,0 +1,10 @@
+{
+    "coverage_options": {
+      "minimum_coverage": 80
+    },
+    "skip_files": [
+      "lib/instacamp_web.ex",
+      "lib/instacamp/release.ex",
+      "test/support/data_case.ex"
+    ]
+  }

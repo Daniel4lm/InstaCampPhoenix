@@ -1,0 +1,12 @@
+<div x-data="{ open: false }">
+    <button @click="open = true">Open Dropdown</button>
+
+    <ul
+        x-show="open"
+        @click.away="open = false"
+    >
+        Dropdown Body
+    </ul>
+</div>
+
+<h1 class="text-sky-400 text-5xl font-bold text-center">Instagram Clone</h1>
