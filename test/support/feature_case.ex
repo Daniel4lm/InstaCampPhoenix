@@ -1,0 +1,98 @@
+defmodule InstacampWeb.FeatureCase do
+  @moduledoc false
+
+  use ExUnit.CaseTemplate
+
+  # alias Ecto.Adapters.SQL.Sandbox, as: SQLSandbox
+
+  alias Instacamp.Posts
+  alias Wallaby.Browser
+  alias Wallaby.Element
+  alias Wallaby.Query
+
+  @type session :: Wallaby.Session.t()
+
+  using do
+    quote do
+      use Wallaby.Feature
+
+      import InstacampWeb.FeatureCase
+      import Wallaby.Query
+
+      # use Wallaby.DSL
+      alias InstacampWeb.Router.Helpers, as: Routes
+
+      # The default endpoint for testing
+      @endpoint InstacampWeb.Endpoint
+
+      setup _ do
+        on_exit(fn -> Application.put_env(:wallaby, :js_logger, :stdio) end)
+      end
+    end
+  end
+
+  setup tags do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Instacamp.Repo)
+
+    unless tags[:async] do
+      Ecto.Adapters.SQL.Sandbox.mode(Instacamp.Repo, {:shared, self()})
+    end
+
+    metadata = Phoenix.Ecto.SQL.Sandbox.metadata_for(Instacamp.Repo, self())
+    {:ok, session} = Wallaby.start_session(metadata: metadata)
+    {:ok, session: session}
+    # pid = SQLSandbox.start_owner!(Instacamp.Repo, shared: true)
+    # on_exit(fn -> SQLSandbox.stop_owner(pid) end)
+
+    # Application.put_env(:story_deck, Instacamp.Mailer, adapter: Swoosh.Adapters.Local)
+
+    # metadata = Phoenix.Ecto.SQL.Sandbox.metadata_for(Instacamp.Repo, self())
+
+    # {:ok, session} = Wallaby.start_session(metadata: metadata)
+
+    # {:ok, metadata: metadata, session: session}
+  end
+
+  @spec log_in_user(session(), String.t(), String.t()) :: session()
+  def log_in_user(session, email, password) do
+    email_query = Query.css(~s([name="user[email]"]))
+    pass_query = Query.css(~s([name="user[password]"]))
+    log_in_query = Query.button("Log In")
+
+    session
+    |> Browser.assert_text("Log in form")
+    |> Browser.fill_in(email_query, with: email)
+    |> Browser.fill_in(pass_query, with: password)
+    |> Browser.click(log_in_query)
+  end
+
+  @spec visit_root_path(session()) :: session()
+  def visit_root_path(session) do
+    Browser.visit(session, "/")
+  end
+
+  @spec open_post_page(session(), Posts.Post.t()) :: session()
+  def open_post_page(session, %Posts.Post{} = post) do
+    Browser.visit(session, "/post/" <> post.slug)
+  end
+
+  @spec open_mailbox(session()) :: session()
+  def open_mailbox(session) do
+    list_group_item = Query.css(".list-group-item")
+
+    session
+    |> Browser.visit("/dev/mailbox")
+    |> wait(4000)
+    |> Browser.all(list_group_item)
+    |> List.first()
+    |> Element.click()
+
+    Browser.focus_frame(session, Query.css("iframe"))
+  end
+
+  @spec wait(session(), integer()) :: session()
+  def wait(session, timeout) do
+    :timer.sleep(timeout)
+    session
+  end
+end

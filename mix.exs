@@ -5,7 +5,7 @@ defmodule Instacamp.MixProject do
     [
       app: :instacamp,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -14,7 +14,7 @@ defmodule Instacamp.MixProject do
       test_coverage: [tool: ExCoveralls],
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore.exs",
-        plt_add_apps: [:ex_unit, :mix],
+        plt_add_apps: [:ex_unit, :mix, :wallaby],
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
       ],
       preferred_cli_env: [
@@ -58,6 +58,7 @@ defmodule Instacamp.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.6.15"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6"},
@@ -74,13 +75,13 @@ defmodule Instacamp.MixProject do
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      # ---------------------------------------------------------
       {:excoveralls, "~> 0.14", only: [:dev, :test]},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.8", only: [:dev, :test], runtime: false},
-      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
-      {:timex, "~> 3.7"}
+      {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
+      {:timex, "~> 3.7"},
+      {:wallaby, "~> 0.30", runtime: false, only: :test}
     ]
   end
 
@@ -93,7 +94,12 @@ defmodule Instacamp.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": [
+        "ecto.create",
+        "ecto.migrate",
+        "run priv/repo/seeds.exs",
+        "run priv/repo/seeds.dev.exs"
+      ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],

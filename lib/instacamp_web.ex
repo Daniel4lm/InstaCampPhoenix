@@ -48,6 +48,7 @@ defmodule InstacampWeb do
         layout: {InstacampWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
+      use InstacampWeb.LiveHelpers
     end
   end
 
@@ -91,12 +92,14 @@ defmodule InstacampWeb do
 
       # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
       import Phoenix.LiveView.Helpers
+      import InstacampWeb.LiveHelpers
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
       import InstacampWeb.ErrorHelpers
       import InstacampWeb.Gettext
+
       alias InstacampWeb.Router.Helpers, as: Routes
     end
   end

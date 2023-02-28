@@ -1,0 +1,60 @@
+<div id="saved-posts-section" class="md:w-full 2xl:w-8/12 md:mx-auto h-full mx-2 py-2">
+  <div class="w-full p-2">
+    <section
+      class="w-full my-2 p-4 bg-white dark:bg-slate-600 dark:text-slate-100 border border-[#d1d9d1] dark:border-transparent rounded-xl min-h-[45vh]"
+      id="saved-posts-list"
+    >
+      <SettingsTabsComponent.settings_tabs current_uri_path={@active_path} tabs={@setting_tabs} />
+      <hr class="dark:border-slate-500" />
+
+      <%= if @live_action == :search do %>
+        <.form
+          let={f}
+          for={:list_search}
+          id="search-saved-form"
+          phx-submit="search_list"
+          class="mx-4 my-6"
+          as={:search_term}
+        >
+          <div class="flex items-center">
+            <div class="flex-1">
+              <%= text_input(f, :term,
+                class:
+                  "w-full h-10 rounded-tl-lg rounded-bl-lg rounded-tr-none rounded-br-none border-2 border-r-0 border-gray-200 bg-white dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 outline-none focus:ring-transparent focus:border-gray-400 duration-300",
+                rows: 3,
+                placeholder: "Search for posts...",
+                autocorrect: "off",
+                autocomplete: "off"
+              ) %>
+            </div>
+            <%= submit id: "search-saved-submit", class: "p-3 h-10 text-white bg-sky-500 border-0 rounded-tl-none rounded-bl-none rounded-tr-lg rounded-br-lg hover:bg-sky-400 duration-300" do %>
+              <Icons.search_icon />
+            <% end %>
+          </div>
+        </.form>
+
+        <SavedListComponents.saved_list_component
+          socket={@socket}
+          list={@search_list}
+          title={"Search list (#{@user_bookmarks_count})"}
+        />
+      <% else %>
+        <SavedListComponents.saved_list_component
+          socket={@socket}
+          list={@reading_list}
+          title={"Saved list (#{@user_bookmarks_count})"}
+        />
+      <% end %>
+    </section>
+  </div>
+
+  <button
+    class={
+      "w-max justify-center items-center mx-auto my-4 px-4 py-2 border border-gray-100 text-gray-400 ease-in-out duration-200 hover:text-gray-600 hover:bg-gray-200 hover:border-gray-200 rounded-md cursor-pointer focus:outline-none " <>
+        @load_more_posts_btn
+    }
+    phx-click="load_more_posts"
+  >
+    Load more
+  </button>
+</div>

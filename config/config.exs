@@ -49,7 +49,7 @@ config :phoenix, :json_library, Jason
 
 # Tailwind CSS configuration
 config :tailwind,
-  version: "3.1.8",
+  version: "3.2.4",
   default: [
     args: ~w(
     --config=tailwind.config.js

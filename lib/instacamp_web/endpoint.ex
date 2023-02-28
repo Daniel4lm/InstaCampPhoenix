@@ -10,7 +10,14 @@ defmodule InstacampWeb.Endpoint do
     signing_salt: "tzr6HCuT"
   ]
 
+  if Application.compile_env(:instacamp, :sql_sandbox) do
+    plug Phoenix.Ecto.SQL.Sandbox
+  end
+
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+
+  # socket "/live", Phoenix.LiveView.Socket,
+  #   websocket: [connect_info: [:user_agent, session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -20,7 +27,7 @@ defmodule InstacampWeb.Endpoint do
     at: "/",
     from: :instacamp,
     gzip: false,
-    only: ~w(assets fonts images favicon.ico robots.txt)
+    only: ~w(assets fonts images uploads favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

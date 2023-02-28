@@ -20,31 +20,34 @@
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html"
-import Alpine from 'alpinejs'
 // Establish Phoenix Socket and LiveView configuration.
 import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-
-window.Alpine = Alpine;
-Alpine.start();
+import ScrollHooks from "./hooks/user_profile_posts_scroll"
+import CommentTextBody from "./hooks/comment_input"
+import CopyUrlHook from "./hooks/post/copy_url"
+import TrixEditorHook from "./hooks/trix_editor"
+import ImageUploadDragDropHook from "./hooks/drag_drop_hook"
+import CreatePostTag from "./hooks/post/post_tags"
+import ThemeHooks from "./hooks/dark_mode"
+import ToolTip from "./hooks/tooltip"
 
 let Hooks = {
-    // ...Hooks_1,
-    // ...Hooks_n,
+    ...ScrollHooks,
+    CommentTextBody,
+    CopyUrlHook,
+    TrixEditorHook,
+    ImageUploadDragDropHook,
+    CreatePostTag,
+    ...ThemeHooks,
+    ToolTip
 };
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
     params: { _csrf_token: csrfToken },
     hooks: Hooks,
-    dom: {
-        onBeforeElUpdated(from, to) {
-            if (from.__x) {
-                window.Alpine.clone(from.__x, to)
-            }
-        }
-    }
 })
 
 // Show progress bar on live navigation and form submits

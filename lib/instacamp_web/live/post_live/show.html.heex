@@ -1,0 +1,345 @@
+<div class="flex sm:w-full 2xl:w-3/4 md:mx-auto BG overflow-hidden max-h-screen sm:px-4">
+  <aside
+    class="fixed w-full sm:w-max z-[10] left-0 bottom-0 mr-1 border-t border-gray-300 dark:text-slate-100 rounded-lg sm:mt-8 bg-white dark:bg-slate-700 sm:border-0 sm:bg-transparent sm:p-6 sm:relative"
+    aria-label="Post actions"
+  >
+    <div class="flex justify-around sm:flex-col">
+      <div
+        id="like-hover-item"
+        class="relative hover-item flex sm:flex-col py-2 items-center"
+        phx-hook="ToolTip"
+      >
+        <%= if @current_user && @current_user.id != @post.user.id do %>
+          <div class="rounded-full p-2 cursor-pointer border border-transparent hover:border-red-200 hover:bg-red-100 dark:hover:bg-transparent dark:hover:border-transparent">
+            <.live_component
+              id="post-like-comp"
+              module={LikeComponent}
+              current_user={@current_user}
+              resource={@post}
+              resource_name={:post}
+            />
+          </div>
+        <% else %>
+          <div id="post-like-icon" class="py-2">
+            <Icons.heart_icon />
+          </div>
+        <% end %>
+        <span id="post-total-likes" class="mx-2"><%= @post.total_likes %></span>
+        <span class="side-tooltip-text px-4 py-2 rounded-md bg-gray-800 text-white text-sm ">
+          Like
+        </span>
+      </div>
+
+      <div
+        id="scroll-to-hook"
+        class="relative hover-item flex sm:flex-col py-2 items-center cursor-pointer"
+        phx-hook="ToolTip"
+      >
+        <div
+          id="post-comment-icon"
+          class="rounded-full p-2 border border-transparent hover:border-orange-200 hover:bg-orange-100 hover:text-amber-500 dark:hover:bg-transparent dark:hover:border-transparent"
+          phx-hook="ScrollToComments"
+        >
+          <Icons.comment_icon />
+        </div>
+        <span id="post-total-comments" class="mx-2"><%= @post.total_comments %></span>
+        <span class="side-tooltip-text px-4 py-2 rounded-md bg-gray-800 text-white text-sm ">
+          Jump to comments
+        </span>
+      </div>
+
+      <div
+        id="tag-hover-item"
+        class="relative hover-item flex sm:flex-col py-4 items-center"
+        phx-hook="ToolTip"
+      >
+        <%= if @current_user && @current_user.id != @post.user.id do %>
+          <div class="rounded-full p-2 cursor-pointer border border-transparent hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-transparent dark:hover:border-transparent">
+            <.live_component
+              id="post-tag-comp"
+              module={TagComponent}
+              current_user={@current_user}
+              post={@post}
+            />
+          </div>
+        <% else %>
+          <div id="post-tag-icon" class="py-2 text-gray-500">
+            <Icons.tag_icon />
+          </div>
+        <% end %>
+        <span id="post-bookmarks-count" class="mx-2"><%= @bookmarks_count %></span>
+        <span class="side-tooltip-text px-4 py-2 rounded-md bg-gray-800 text-white text-sm">
+          Save
+        </span>
+      </div>
+
+      <div id="post-opts" class="relative flex sm:flex-col py-2 items-center cursor-pointer">
+        <div
+          id="post-options-icon"
+          class="relative hover-item rounded-full p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-500"
+          phx-hook="ToolTip"
+          phx-click={
+            JS.toggle(
+              to: "#opts-menu",
+              in: "transition ease-out duration-200",
+              out: "transition ease-out duration-200 opacity-0 transform scale-90"
+            )
+          }
+        >
+          <Icons.opts_icon />
+          <span class="top-tooltip-text px-4 py-2 rounded-md bg-gray-800 text-white text-sm ">
+            Other options
+          </span>
+        </div>
+        <ul
+          id="opts-menu"
+          class="absolute hidden min-w-[14rem] h-max bg-white dark:bg-slate-500 dark:text-slate-100 rounded-lg border border-gray-300 dark:border-transparent bottom-full -right-1/2 sm:top-0 sm:left-full p-2"
+          phx-click-away={
+            JS.hide(
+              to: "#opts-menu",
+              transition: "transition ease-out duration-200 opacity-0 transform scale-90"
+            )
+          }
+        >
+          <li class="py-2 px-2 rounded-md">
+            <div
+              id="copy-url-picker"
+              phx-hook="CopyUrlHook"
+              data-copy-url={@copy_url}
+              class="flex justify-between cursor-pointer"
+            >
+              <span>Copy link</span>
+              <Icons.copy_link_icon />
+            </div>
+            <div
+              id="article-copy-link-announcer"
+              class="bg-sky-100 dark:bg-slate-400 rounded-md px-4 py-1 mt-2 hidden"
+            >
+              Copied to Clipboard
+            </div>
+          </li>
+          <%= if @current_user && @current_user.id == @post.user.id do %>
+            <%= link to: "#", id: "delete-post-#{@post.id}", phx_click: "delete_post", phx_value_id: @post.id, data: [confirm: "Are you sure you want to delete post?"] do %>
+              <li class="py-2 px-2 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50">
+                <div class="flex items-center justify-between">
+                  <span>Delete post</span>
+
+                  <div class="p-1"><Icons.delete_icon /></div>
+                </div>
+              </li>
+            <% end %>
+            <%= live_redirect to: Routes.post_form_path(@socket, :edit, @post.id), id: "edit-post-#{@post.id}" do %>
+              <li class="py-2 px-2 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                  <span>Edit post</span>
+                  <div class="p-1"><Icons.edit_icon /></div>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+      <div
+        id="scroll-to-top"
+        class="flex sm:flex-col py-2 items-center cursor-pointer"
+        phx-hook="ScrollToTop"
+      >
+        <div class="rounded-xl p-2 cursor-pointer border border-transparent hover:border-sky-200 hover:bg-sky-100 dark:hover:bg-slate-500 dark:hover:border-transparent">
+          <Icons.scroll_to_top_icon />
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <%= if @live_action == :edit_comment do %>
+    <.modal
+      return_to={Routes.post_show_path(@socket, :show, @post.slug)}
+      w_size="w-[90%] md:w-2/3 xl:w-1/3"
+    >
+      <.live_component
+        action={@live_action}
+        comment_changeset={@comment_changeset}
+        id={:comment}
+        module={EditComment}
+        return_to={Routes.post_show_path(@socket, :show, @post.slug)}
+      />
+    </.modal>
+  <% end %>
+
+  <div id="post-wrapper" class="w-full overflow-y-auto pt-8">
+    <article
+      id="user-post"
+      class="flex flex-col bg-white dark:bg-slate-100 dark:text-slate-700 border-t border-b sm:border border-[#d1d9d1] dark:border-0 sm:rounded-lg mb-4 py-6"
+    >
+      <!-- Post Header section -->
+      <header class="mx-4 sm:mx-12 my-2">
+        <div class="flex items-center ">
+          <%= live_redirect to: Routes.user_profile_path(@socket, :index, @post.user.username) do %>
+            <%= img_tag(@post.user.avatar_url,
+              class:
+                "w-10 h-10 rounded-full object-cover object-center p-[1px] border border-gray-300"
+            ) %>
+          <% end %>
+          <div class="flex-1 ml-4">
+            <%= live_redirect(
+              @post.user.full_name,
+              to: Routes.user_profile_path(@socket, :index, @post.user.username),
+              class: "font-bold"
+            ) %>
+            <p class="flex text-[0.9em] gap-1">
+              Posted on
+              <time
+                datetime={@post.updated_at}
+                class="date-no-year"
+                title={DateTimeHelper.format_post_date(@post.updated_at)}
+              >
+                <%= DateTimeHelper.format_post_date(@post.updated_at) %>
+              </time>
+            </p>
+          </div>
+          <span class="text-gray-500">
+            Reading time • <%= Posts.calculate_read_time(@post) %> min
+          </span>
+        </div>
+        <h1 class="font-bold text-3xl my-4"><%= @post.title %></h1>
+
+        <div id="post-tags" class="flex flex-wrap gap-2 my-4 text-gray-900 text-sm md:text-base">
+          <%= for tag <- @post.tags do %>
+            <%= live_redirect to: Routes.post_list_path(@socket, :index, tag.name) do %>
+              <span class="border rounded-b-md rounded-t-xl rounded-br-xl border-gray-200 px-3 py-1 bg-gray-200 hover:bg-sky-100 hover:border-blue-300 cursor-pointer z-[1]">
+                #<%= tag.name %>
+              </span>
+            <% end %>
+          <% end %>
+        </div>
+      </header>
+      <hr class="mx-4 sm:mx-12 my-4 " />
+      <!-- Post Image section -->
+      <%= if @post.photo_url do %>
+        <div class="max-w-[44rem] 2xl:max-w-3xl mx-auto px-4 sm:px-12 lg:px-0 my-8 rounded-lg overflow-hidden">
+          <%= img_tag(@post.photo_url,
+            class: "object-contain rounded-lg h-full"
+          ) %>
+        </div>
+      <% end %>
+      <!-- End Post Image section -->
+
+      <!-- Post text section -->
+      <div
+        id="post-body"
+        class="mx-4 sm:mx-12 py-4 text-sm md:text-base text-gray-700 text-justify"
+      >
+        <%= raw(@post.body) %>
+      </div>
+      <!-- End Post Text section -->
+      <hr />
+      <!-- Post Comments section -->
+      <div id="post-comments-section" class="h-full mx-4 sm:mx-12 py-2">
+        <div class="w-full">
+          <!-- Action icons section -->
+          <div class="w-max mx-auto flex items-start pl-4 pr-2 py-4">
+            <div class="flex items-center text-gray-600">
+              <Icons.heart_icon />
+              <span class="px-2 text-base text-gray-600 font-bold focus:outline-none">
+                <%= @post.total_likes %> likes
+              </span>
+            </div>
+            <div class="flex items-center ml-4">
+              <Icons.chat_icon />
+              <span class="px-2 text-base text-gray-600 font-bold focus:outline-none">
+                <%= @post.total_comments %> comments
+              </span>
+            </div>
+            <div class="flex items-center ml-4">
+              <%= if @current_user && @current_user.id != @post.user.id do %>
+                <Icons.tag_icon is_taged?={@is_taged?} />
+              <% else %>
+                <Icons.tag_icon />
+              <% end %>
+            </div>
+          </div>
+          <!-- End Action icons section -->
+
+          <!-- Comment input section -->
+          <%= if @current_user do %>
+            <div class="py-4 flex flex-col items-start lg:flex-row ">
+              <%= live_redirect to: Routes.user_profile_path(@socket, :index, @current_user.username), class: "m-2 lg:m-0" do %>
+                <div class="w-8 h-8">
+                  <%= img_tag(@current_user.avatar_url,
+                    class: "h-full rounded-full object-center p-[1px] border border-gray-300"
+                  ) %>
+                </div>
+              <% end %>
+
+              <.form
+                let={f}
+                for={@comment_changeset}
+                id="comment-input-form"
+                phx-submit="save_comment"
+                class="w-full"
+                as={:comment}
+              >
+                <div class="flex flex-col">
+                  <div class="lg:ml-4">
+                    <%= hidden_input(f, :body, id: :body_input, phx_hook: "TrixEditorHook") %>
+                    <div id="trix-editor" class="" phx-update="ignore">
+                      <trix-editor
+                        input="body_input"
+                        class="min-h-[100px] rounded-lg border border-[#e0e2e4] dark:bg-white bg-inherit p-2 outline-none focus:ring-transparent focus:border-[#a6a8aa]"
+                        placeholder="Add a comment..."
+                        autocorrect="off"
+                        autocomplete="off"
+                      >
+                      </trix-editor>
+                    </div>
+                  </div>
+                  <%= submit("Submit",
+                    id: "comment-form-submit",
+                    class:
+                      "w-max m-4 py-2 px-4 border-2 rounded-md text-base dark:bg-slate-200 hover:bg-gray-50 hover:border-gray-400"
+                  ) %>
+                </div>
+              </.form>
+            </div>
+          <% else %>
+            <div class="py-4 flex items-center mt-3 border-t-2 border-gray-100">
+              <%= link("Log in to comment",
+                to: Routes.user_auth_login_path(@socket, :new),
+                class: "text-light-blue-600"
+              ) %>
+            </div>
+          <% end %>
+          <!-- End Comment input section -->
+        </div>
+
+        <div class="w-full py-4">
+          <%= unless Enum.empty?(@post_comments) do %>
+            <h1 class="text-lg">Comments:</h1>
+            <section class="w-full" id="post-comments-list" phx-update={@comments_section_update}>
+              <%= for comment <- @post_comments do %>
+                <.live_component
+                  id={"comments-list-comp " <> comment.id}
+                  module={CommentComponent}
+                  current_user={@current_user}
+                  comment={comment}
+                />
+              <% end %>
+            </section>
+          <% else %>
+            <h1 class="text-lg">No comments yet</h1>
+          <% end %>
+        </div>
+
+        <button
+          class={
+            "w-max justify-center items-center mx-auto my-4 px-4 py-2 border border-gray-100 text-gray-400 ease-in-out duration-200 hover:text-gray-600 hover:bg-gray-200 hover:border-gray-200 rounded-md cursor-pointer focus:outline-none " <>
+              @load_more_comments_btn
+          }
+          phx-click="load_more_comments"
+        >
+          Load more
+        </button>
+      </div>
+    </article>
+  </div>
+</div>

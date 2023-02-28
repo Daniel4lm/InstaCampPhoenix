@@ -1,5 +1,8 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+config :bcrypt_elixir, :log_rounds, 1
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -18,7 +21,7 @@ config :instacamp, Instacamp.Repo,
 config :instacamp, InstacampWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "Sv/UB6ObgeqZal1UaXN5tL7q3FJoLO+FlTr9gq0Dg/4RYMvtkr/z+sS+UFt98yOs",
-  server: false
+  server: true
 
 # In test we don't send emails.
 config :instacamp, Instacamp.Mailer, adapter: Swoosh.Adapters.Test
@@ -28,3 +31,11 @@ config :logger, level: :warn
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Wallaby config
+config :wallaby,
+  chromedriver: [headless: true],
+  max_wait_time: 10_000,
+  screenshot_on_failure: true
+
+config :instacamp, sql_sandbox: true
