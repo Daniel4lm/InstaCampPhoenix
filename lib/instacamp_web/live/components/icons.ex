@@ -15,7 +15,9 @@ defmodule InstacampWeb.Components.Icons do
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      class="w-6 h-6 md:w-7 md:h-7"
+      width="24"
+      height="24"
+      class="md:w-7 md:h-7"
     >
       <path
         stroke-linecap="round"
@@ -98,7 +100,9 @@ defmodule InstacampWeb.Components.Icons do
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      class="w-6 h-6 md:w-7 md:h-7"
+      width="24"
+      height="24"
+      class="md:w-7 md:h-7"
     >
       <path
         stroke-linecap="round"
