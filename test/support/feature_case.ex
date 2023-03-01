@@ -25,6 +25,14 @@ defmodule InstacampWeb.FeatureCase do
       # The default endpoint for testing
       @endpoint InstacampWeb.Endpoint
 
+      @type session :: Wallaby.Session.t()
+
+      @spec lazily_refute_has(session(), Wallaby.Query) :: session()
+      def lazily_refute_has(parent, %Query{} = query) do
+        conditions = Keyword.put(query.conditions, :count, 0)
+        assert_has(parent, %Query{query | conditions: conditions})
+      end
+
       setup _ do
         on_exit(fn -> Application.put_env(:wallaby, :js_logger, :stdio) end)
       end
