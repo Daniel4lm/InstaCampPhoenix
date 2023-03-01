@@ -13,9 +13,8 @@ defmodule InstacampWeb.Features.AuthTest do
     |> fill_in(Query.css(~s([name="user[username]")), with: "john_4k")
     |> fill_in(Query.css(~s([name="user[password]")), with: "Valid_password")
     |> click(Query.button("Sign up"))
-
-    session
-    |> find(Query.css(".alert-info"))
+    |> lazily_refute_has(Query.text("Sign up to see post and videos from your friends."))
+    |> wait(400)
     |> assert_text("Welcome John Kiwi. Your account is created successfully!")
 
     photo_field = file_field("avatar_url")

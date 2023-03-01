@@ -86,14 +86,14 @@ jobs:
       - name: Install Elixir dependencies
         run: mix deps.get
 
-        # Don't cache PLTs based on mix.lock hash, as Dialyzer can incrementally update even old ones
+      # Don't cache PLTs based on mix.lock hash, as Dialyzer can incrementally update even old ones
       # Cache key based on Elixir & Erlang version (also useful when running in matrix)
       - name: Restore PLT cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: plt_cache
         with:
-          key: ${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-v2-plt
-          restore-keys: ${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-v2-plt
+          key: ${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-plt
+          restore-keys: ${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-plt
           path: priv/plts
 
       # Create PLTs if no cache was found
