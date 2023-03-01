@@ -106,3 +106,9 @@ jobs:
         run: |
           mix ci
           mix ci.migrations
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: screenshots
+          path: screenshots/
