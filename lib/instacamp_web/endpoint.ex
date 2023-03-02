@@ -10,11 +10,9 @@ defmodule InstacampWeb.Endpoint do
     signing_salt: "tzr6HCuT"
   ]
 
-  if sandbox = Application.compile_env(:instacamp, :sql_sandbox) do
-    plug Phoenix.Ecto.SQL.Sandbox, sandbox: sandbox
+  if Application.compile_env(:instacamp, :sql_sandbox) do
+    plug Phoenix.Ecto.SQL.Sandbox
   end
-
-  # socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [connect_info: [:user_agent, session: @session_options]]
