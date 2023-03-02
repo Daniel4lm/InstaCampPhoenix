@@ -3,8 +3,6 @@ defmodule InstacampWeb.FeatureCase do
 
   use ExUnit.CaseTemplate
 
-  # alias Ecto.Adapters.SQL.Sandbox, as: SQLSandbox
-
   alias Instacamp.Posts
   alias Wallaby.Browser
   alias Wallaby.Element
@@ -49,16 +47,6 @@ defmodule InstacampWeb.FeatureCase do
     metadata = Phoenix.Ecto.SQL.Sandbox.metadata_for(Instacamp.Repo, self())
     {:ok, session} = Wallaby.start_session(metadata: metadata)
     {:ok, session: session}
-    # pid = SQLSandbox.start_owner!(Instacamp.Repo, shared: true)
-    # on_exit(fn -> SQLSandbox.stop_owner(pid) end)
-
-    # Application.put_env(:story_deck, Instacamp.Mailer, adapter: Swoosh.Adapters.Local)
-
-    # metadata = Phoenix.Ecto.SQL.Sandbox.metadata_for(Instacamp.Repo, self())
-
-    # {:ok, session} = Wallaby.start_session(metadata: metadata)
-
-    # {:ok, metadata: metadata, session: session}
   end
 
   @spec log_in_user(session(), String.t(), String.t()) :: session()
