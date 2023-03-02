@@ -131,7 +131,7 @@ defmodule Instacamp.MixProject do
         "coveralls.html"
       ],
       "test.prepare": [
-        "esbuild default",
+        "assets.deploy",
         "ecto.create --quiet",
         "ecto.migrate --quiet"
       ]
