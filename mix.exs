@@ -121,6 +121,7 @@ defmodule Instacamp.MixProject do
         # "sobelow --config .sobelow-conf"
       ],
       "ci.formatting": ["format --check-formatted"],
+      "ci.migrations": ["ecto.migrate --quiet", "ecto.rollback --all --quiet"],
       "ci.test": ["cover.full"],
       "cover.full": [
         "test.prepare",
