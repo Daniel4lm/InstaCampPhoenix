@@ -68,7 +68,6 @@ defmodule InstacampWeb.PostLive.Show do
 
   @impl Phoenix.LiveView
   def handle_params(params, url, socket) do
-    # {:noreply, assign(socket, :copy_url, url)}
     {:noreply,
      socket
      |> assign(:copy_url, url)

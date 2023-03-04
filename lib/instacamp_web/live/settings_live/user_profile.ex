@@ -71,17 +71,6 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
     assign(socket, :followers, followers)
   end
 
-  # defp redirect_when_not_my_page(socket) do
-  #   user = socket.assigns.user
-  #   current_user = socket.assigns.current_user
-
-  #   if current_user && current_user.id == user.id do
-  #     socket
-  #   else
-  #     push_patch(socket, to: Routes.user_profile_path(socket, :index, user.username))
-  #   end
-  # end
-
   @impl Phoenix.LiveView
   def handle_event("show_more_posts", %{"page" => new_page} = _params, socket) do
     total_posts = socket.assigns.user.posts_count
