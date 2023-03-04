@@ -20,7 +20,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
   def render(assigns) do
     ~H"""
     <div class="w-full my-4" id={"comment-component-#{@comment.id}"}>
-      <div class="relative flex flex-col border rounded-md dark:bg-slate-200 dark:border-slate-300 p-4">
+      <div class="relative flex flex-col border rounded-md dark:border-slate-400 p-4">
         <div class="flex items-center gap-2">
           <%= live_redirect to: Routes.user_profile_path(@socket, :index, @comment.user.username) do %>
             <%= img_tag(@comment.user.avatar_url,
@@ -30,7 +30,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
           <% end %>
           <%= live_redirect(@comment.user.username,
             to: Routes.user_profile_path(@socket, :index, @comment.user.username),
-            class: "truncate font-bold text-gray-500 hover:underline"
+            class: "truncate font-bold text-gray-500 dark:text-inherit hover:underline"
           ) %>
           <p class="flex text-sm sm:text-base gap-1">
             •
@@ -50,7 +50,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
         <%= if @current_user && @current_user.id == @comment.user.id do %>
           <div class="absolute top-2 right-2 cursor-pointer">
             <div
-              class="relative rounded-lg p-1 dark:bg-slate-200 hover:bg-gray-100 dark:hover:bg-slate-300"
+              class="relative rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-slate-700"
               phx-click={JS.toggle(to: "#comments-menu-#{@comment.id}")}
             >
               <Icons.opts_icon />
@@ -58,7 +58,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
             <ul
               id={"comments-menu-#{@comment.id}"}
               phx-click-away={JS.hide(to: "#comments-menu-#{@comment.id}")}
-              class="absolute hidden min-w-[10rem] w-max bg-white dark:bg-slate-500 dark:text-slate-100 dark:border-transparent top-full right-0 rounded-lg border border-gray-300 p-2 text-sm sm:text-base"
+              class="absolute hidden min-w-[10rem] w-max bg-white dark:bg-slate-500 dark:text-slate-100 dark:border-transparent top-full mt-1 right-0 rounded-lg border border-gray-300 p-2 text-sm sm:text-base"
             >
               <li class="py-2 px-2 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50">
                 <%= link to: "#", id: "delete-comment-#{@comment.id}", phx_click: "delete_comment", phx_value_id: @comment.id, data: [confirm: "Are you sure?"] do %>
@@ -81,7 +81,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
         <% end %>
         <%= unless Enum.empty?(@related_users) do %>
           <div id={"comment-#{@comment.id}-users-list"} class="hidden flex items-center">
-            <hr />
+            <hr class="dark:border-slate-500" />
             <div class="flex items-center flex-wrap gap-2 mt-4">
               <%= for user <- @related_users do %>
                 <div
@@ -101,7 +101,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
                   </span>
                 </div>
               <% end %>
-              <span class="text-sm text-gray-600">liked this</span>
+              <span class="text-sm">liked this</span>
             </div>
           </div>
         <% end %>
@@ -110,7 +110,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
       <%= if @current_user do %>
         <div class="flex my-2 text-sm sm:text-base">
           <%= if @current_user.id != @comment.user_id do %>
-            <div class="flex items-center bg-gray-50 dark:bg-slate-200 gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-300 hover:cursor-pointer">
+            <div class="flex items-center bg-gray-50 dark:bg-slate-500 gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-400 hover:cursor-pointer">
               <.live_component
                 id={@comment.id}
                 module={LikeComponent}
@@ -125,7 +125,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
             </div>
           <% end %>
           <div
-            class="flex items-center bg-gray-50 dark:bg-slate-200 p-2 ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-300 hover:cursor-pointer"
+            class="flex items-center bg-gray-50 dark:bg-slate-500 p-2 ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-400 hover:cursor-pointer"
             phx-click={JS.toggle(to: "#comment-#{@comment.id}-users-list")}
           >
             <span id={"comment-likes-count-#{@comment.id}"}><%= @comment.total_likes %> Likes</span>
