@@ -27,21 +27,21 @@ import topbar from "../vendor/topbar"
 import ScrollHooks from "./hooks/user_profile_posts_scroll"
 import CommentTextBody from "./hooks/comment_input"
 import CopyUrlHook from "./hooks/post/copy_url"
-import TrixEditorHook from "./hooks/trix_editor"
+import TrixEditorHooks from "./hooks/trix_editor"
 import ImageUploadDragDropHook from "./hooks/drag_drop_hook"
 import CreatePostTag from "./hooks/post/post_tags"
 import ThemeHooks from "./hooks/dark_mode"
 import ToolTip from "./hooks/tooltip"
 
 let Hooks = {
-    ...ScrollHooks,
     CommentTextBody,
     CopyUrlHook,
-    TrixEditorHook,
-    ImageUploadDragDropHook,
     CreatePostTag,
+    ImageUploadDragDropHook,
+    ...ScrollHooks,
     ...ThemeHooks,
-    ToolTip
+    ToolTip,
+    ...TrixEditorHooks
 };
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
