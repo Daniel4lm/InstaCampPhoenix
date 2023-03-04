@@ -272,7 +272,7 @@
               >
                 <div class="flex flex-col">
                   <div class="lg:ml-4">
-                    <%= hidden_input(f, :body, id: :body_input, phx_hook: "TrixEditorHook") %>
+                    <%= hidden_input(f, :body, id: :body_input, phx_hook: "CommentBodyHook") %>
                     <div id="trix-editor" class="" phx-update="ignore">
                       <trix-editor
                         input="body_input"
