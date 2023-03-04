@@ -60,8 +60,6 @@ defmodule InstacampWeb.PostLive.Form do
   end
 
   def handle_event("validate_post", %{"post" => post_params}, socket) do
-    # update_params = Map.put(post_params, "tags", "")
-
     post_changeset =
       %Post{}
       |> Posts.change_post(post_params)
@@ -97,13 +95,6 @@ defmodule InstacampWeb.PostLive.Form do
              Map.put(params, "tags", parse_tags(socket.assigns.post_tags))
            ) do
       post_action_broadcast(live_action, post)
-
-      # info_message =
-      #   if live_action == :new do
-      #     "Blog post created successfully!"
-      #   else
-      #     "Blog post updated successfully!"
-      #   end
 
       {:noreply,
        push_redirect(socket,

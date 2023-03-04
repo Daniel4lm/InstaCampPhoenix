@@ -4,7 +4,6 @@ ScrollHooks.ScrollToComments = {
     mounted() {
         this.el.addEventListener('click', () => {
             const commentsSection = document.getElementById('post-comments-section')
-            console.log(commentsSection)
 
             commentsSection.scrollIntoView({ behavior: 'smooth', block: "start" })
         })

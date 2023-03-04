@@ -93,7 +93,7 @@
         </div>
         <ul
           id="opts-menu"
-          class="absolute hidden min-w-[14rem] h-max bg-white dark:bg-slate-500 dark:text-slate-100 rounded-lg border border-gray-300 dark:border-transparent bottom-full -right-1/2 sm:top-0 sm:left-full p-2"
+          class="absolute hidden min-w-[14rem] h-max bg-white dark:bg-slate-500 dark:text-slate-100 rounded-lg border border-gray-300 dark:border-transparent bottom-full -right-1/2 sm:top-0 sm:left-full sm:ml-1 p-2"
           phx-click-away={
             JS.hide(
               to: "#opts-menu",
@@ -169,9 +169,8 @@
   <div id="post-wrapper" class="w-full overflow-y-auto pt-8">
     <article
       id="user-post"
-      class="flex flex-col bg-white dark:bg-slate-100 dark:text-slate-700 border-t border-b sm:border border-[#d1d9d1] dark:border-0 sm:rounded-lg mb-4 py-6"
+      class="flex flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t border-b sm:border border-[#d1d9d1] dark:border-0 sm:rounded-lg mb-4 py-6"
     >
-      <!-- Post Header section -->
       <header class="mx-4 sm:mx-12 my-2">
         <div class="flex items-center ">
           <%= live_redirect to: Routes.user_profile_path(@socket, :index, @post.user.username) do %>
@@ -197,24 +196,24 @@
               </time>
             </p>
           </div>
-          <span class="text-gray-500">
+          <span class="text-gray-500 dark:text-gray-100 text-sm lg:text-base">
             Reading time • <%= Posts.calculate_read_time(@post) %> min
           </span>
         </div>
-        <h1 class="font-bold text-3xl my-4"><%= @post.title %></h1>
+        <h1 class="font-bold text-xl lg:text-3xl my-4"><%= @post.title %></h1>
 
-        <div id="post-tags" class="flex flex-wrap gap-2 my-4 text-gray-900 text-sm md:text-base">
+        <div id="post-tags" class="flex flex-wrap gap-2 my-4 text-sm md:text-base">
           <%= for tag <- @post.tags do %>
             <%= live_redirect to: Routes.post_list_path(@socket, :index, tag.name) do %>
-              <span class="border rounded-b-md rounded-t-xl rounded-br-xl border-gray-200 px-3 py-1 bg-gray-200 hover:bg-sky-100 hover:border-blue-300 cursor-pointer z-[1]">
+              <span class="border rounded-b-md rounded-t-xl rounded-br-xl dark:text-slate-700 border-gray-200 px-3 py-1 bg-gray-200 dark:bg-slate-400 dark:border-slate-400 cursor-pointer z-[1]">
                 #<%= tag.name %>
               </span>
             <% end %>
           <% end %>
         </div>
       </header>
-      <hr class="mx-4 sm:mx-12 my-4 " />
-      <!-- Post Image section -->
+      <hr class="mx-4 sm:mx-12 my-4 dark:border-slate-500" />
+
       <%= if @post.photo_url do %>
         <div class="max-w-[44rem] 2xl:max-w-3xl mx-auto px-4 sm:px-12 lg:px-0 my-8 rounded-lg overflow-hidden">
           <%= img_tag(@post.photo_url,
@@ -222,31 +221,25 @@
           ) %>
         </div>
       <% end %>
-      <!-- End Post Image section -->
 
-      <!-- Post text section -->
-      <div
-        id="post-body"
-        class="mx-4 sm:mx-12 py-4 text-sm md:text-base text-gray-700 text-justify"
-      >
+      <div id="post-body" class="mx-4 sm:mx-12 py-4 text-sm md:text-base text-justify">
         <%= raw(@post.body) %>
       </div>
-      <!-- End Post Text section -->
-      <hr />
-      <!-- Post Comments section -->
+
+      <hr class="my-1 dark:border-slate-500" />
+
       <div id="post-comments-section" class="h-full mx-4 sm:mx-12 py-2">
         <div class="w-full">
-          <!-- Action icons section -->
           <div class="w-max mx-auto flex items-start pl-4 pr-2 py-4">
-            <div class="flex items-center text-gray-600">
+            <div class="flex items-center">
               <Icons.heart_icon />
-              <span class="px-2 text-base text-gray-600 font-bold focus:outline-none">
+              <span class="px-2 text-base font-bold focus:outline-none">
                 <%= @post.total_likes %> likes
               </span>
             </div>
             <div class="flex items-center ml-4">
               <Icons.chat_icon />
-              <span class="px-2 text-base text-gray-600 font-bold focus:outline-none">
+              <span class="px-2 text-base font-bold focus:outline-none">
                 <%= @post.total_comments %> comments
               </span>
             </div>
@@ -258,9 +251,7 @@
               <% end %>
             </div>
           </div>
-          <!-- End Action icons section -->
 
-          <!-- Comment input section -->
           <%= if @current_user do %>
             <div class="py-4 flex flex-col items-start lg:flex-row ">
               <%= live_redirect to: Routes.user_profile_path(@socket, :index, @current_user.username), class: "m-2 lg:m-0" do %>
@@ -285,7 +276,7 @@
                     <div id="trix-editor" class="" phx-update="ignore">
                       <trix-editor
                         input="body_input"
-                        class="min-h-[100px] rounded-lg border border-[#e0e2e4] dark:bg-white bg-inherit p-2 outline-none focus:ring-transparent focus:border-[#a6a8aa]"
+                        class="min-h-[100px] rounded-lg border border-[#e0e2e4] dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 bg-inherit p-2 outline-none focus:ring-transparent focus:border-[#a6a8aa]"
                         placeholder="Add a comment..."
                         autocorrect="off"
                         autocomplete="off"
@@ -296,7 +287,7 @@
                   <%= submit("Submit",
                     id: "comment-form-submit",
                     class:
-                      "w-max m-4 py-2 px-4 border-2 rounded-md text-base dark:bg-slate-200 hover:bg-gray-50 hover:border-gray-400"
+                      "w-max m-4 py-2 px-6 border-none shadow rounded-full font-semibold text-sm text-gray-50 hover:bg-indigo-500 bg-indigo-400 cursor-pointer"
                   ) %>
                 </div>
               </.form>
@@ -309,7 +300,6 @@
               ) %>
             </div>
           <% end %>
-          <!-- End Comment input section -->
         </div>
 
         <div class="w-full py-4">
