@@ -27,15 +27,14 @@ defmodule InstacampWeb.Router do
 
     live_session :default,
       on_mount: [
-        {InstacampWeb.LiveAuth, :assign_user},
-        InstacampWeb.NavLive
+        InstacampWeb.LiveHooks,
+        {InstacampWeb.LiveHooks, :assign_user}
       ],
       root_layout: {InstacampWeb.LayoutView, :root} do
       live "/", HomeLive
       live "/user/:username", SettingsLive.UserProfile, :index, as: :user_profile
       live "/user/:username/saved", SettingsLive.UserProfile, :saved, as: :user_profile
       live "/tag/:name", PostLive.List, :index
-
       live "/post/:slug", PostLive.Show, :show
     end
   end
@@ -75,8 +74,8 @@ defmodule InstacampWeb.Router do
 
     live_session :app_auth,
       on_mount: [
-        {InstacampWeb.LiveAuth, :assign_user},
-        InstacampWeb.NavLive
+        InstacampWeb.LiveHooks,
+        {InstacampWeb.LiveHooks, :assign_user}
       ],
       root_layout: {InstacampWeb.LayoutView, :root} do
       get "/auth/settings/confirm_email/:token", UserSettingsController, :confirm_email
@@ -98,8 +97,8 @@ defmodule InstacampWeb.Router do
 
     live_session :more_auth,
       on_mount: [
-        {InstacampWeb.LiveAuth, :assign_user},
-        InstacampWeb.NavLive
+        InstacampWeb.LiveHooks,
+        {InstacampWeb.LiveHooks, :assign_user}
       ],
       root_layout: {InstacampWeb.LayoutView, :root} do
       live "/auth/signup", UserAuthLive.SignUp, :new
