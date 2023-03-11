@@ -182,7 +182,10 @@ defmodule InstacampWeb.Features.PostsTest do
     |> assert_text("Followers 1")
     |> assert_text("Following 1")
 
+    # find(session_1, Query.css("[id='profile-followers-count']"))
+
     session_1
+    |> assert_has(Query.css("[id='profile-followers-count']"))
     |> click(Query.css("[id='profile-followers-count']"))
     |> assert_has(Query.css("[id='follow-list-title']", text: "Followers"))
     |> assert_has(Query.css("[id^='follow-name-']", text: "Damir"))
