@@ -107,6 +107,7 @@ defmodule InstacampWeb.Features.PostsTest do
     |> click(Query.link("Elixir and Phoenix development"))
     |> assert_text("Elixir and Phoenix development")
 
+    # FIXME: Finish when we implement delete modal
     # |> click(Query.css(~s([id="post-options-icon"])))
     # |> assert_text("Delete post")
     # |> accept_prompt([with: "You want to delete post?"], fn session ->
@@ -181,7 +182,10 @@ defmodule InstacampWeb.Features.PostsTest do
     |> assert_text("Followers 1")
     |> assert_text("Following 1")
 
+    # find(session_1, Query.css("[id='profile-followers-count']"))
+
     session_1
+    |> assert_has(Query.css("[id='profile-followers-count']"))
     |> click(Query.css("[id='profile-followers-count']"))
     |> assert_has(Query.css("[id='follow-list-title']", text: "Followers"))
     |> assert_has(Query.css("[id^='follow-name-']", text: "Damir"))
@@ -198,7 +202,6 @@ defmodule InstacampWeb.Features.PostsTest do
     session_2
     |> click(Query.css("[id='notifications']"))
     |> assert_text(user_1.username <> " liked your comment")
-    |> wait(4000)
     |> click(Query.css("[id='notifications']"))
   end
 end

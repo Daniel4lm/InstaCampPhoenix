@@ -6,62 +6,9 @@ defmodule InstacampWeb.LiveHelpers do
   import Phoenix.LiveView
   import Phoenix.LiveView.Helpers
 
-  alias Instacamp.Notifications
-  alias InstacampWeb.Components.Navigation.NotificationsComponent
   alias Phoenix.LiveView.JS
 
   @type tag :: Phoenix.HTML.Tag
-
-  defmacro __using__(_opts) do
-    quote do
-      def handle_info(
-            %Phoenix.Socket.Broadcast{
-              event: "notify_user",
-              payload: %{},
-              topic: "user_notification:" <> _user_id
-            } = _message,
-            socket
-          ) do
-        send_update(NotificationsComponent,
-          id: "notifications-comp",
-          current_user: socket.assigns.current_user,
-          unread_notifications?: true
-        )
-
-        {:noreply, socket}
-      end
-
-      def handle_info({:get_user_notifications, unread_notifications?}, socket) do
-        case Notifications.list_user_notifications(socket.assigns.current_user.id) do
-          [] ->
-            send_update(NotificationsComponent,
-              id: "notifications-comp",
-              notifications: [],
-              while_searching_notifications?: false,
-              current_user: socket.assigns.current_user
-            )
-
-            {:noreply, socket}
-
-          notifications ->
-            if unread_notifications? do
-              Notifications.read_all(socket.assigns.current_user.id)
-            end
-
-            sorted_notifications = Enum.sort_by(notifications, & &1.inserted_at, {:desc, Date})
-
-            send_update(NotificationsComponent,
-              id: "notifications-comp",
-              notifications: sorted_notifications,
-              while_searching_notifications?: false,
-              current_user: socket.assigns.current_user
-            )
-
-            {:noreply, socket}
-        end
-      end
-    end
-  end
 
   @doc """
   Generates tag for menu link.

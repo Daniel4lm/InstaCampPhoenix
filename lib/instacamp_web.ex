@@ -48,7 +48,6 @@ defmodule InstacampWeb do
         layout: {InstacampWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
-      use InstacampWeb.LiveHelpers
     end
   end
 
