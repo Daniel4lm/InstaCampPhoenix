@@ -16,12 +16,12 @@ defmodule InstacampWeb.PostLive.MultitagsSelectComponent do
   @impl Phoenix.LiveComponent
   def render(assigns) do
     ~H"""
-    <div class="flex flex-wrap border border-gray-400 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 focus-within:ring-2 focus-within:ring-indigo-400 dark:focus-within:ring-blue-400 dark:focus-within:border-transparent ring-opacity-90 focus-within:border-transparent rounded-md rounded-md bg-white">
-      <div class="flex items-center flex-wrap flex-1 p-1">
+    <div class="flex flex-wrap border border-gray-400 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 focus-within:ring-2 focus-within:ring-indigo-400 dark:focus-within:ring-blue-400 dark:focus-within:border-transparent ring-opacity-90 focus-within:border-transparent overflow-hidden rounded-md bg-white">
+      <div class="flex items-center flex-wrap flex-1">
         <%= for topic <- @topics do %>
           <div
             id={"post-topic-#{topic}"}
-            class="flex flex-row justify-center items-center rounded rounded-lg text-sm text-gray-600 text-center bg-indigo-100 dark:bg-slate-300 p-2 mx-1"
+            class="flex flex-row justify-center items-center rounded rounded-lg text-sm md:text-base text-gray-600 text-center bg-indigo-100 dark:bg-slate-300 p-2 mx-1"
           >
             #<%= topic %>
             <div
@@ -39,7 +39,7 @@ defmodule InstacampWeb.PostLive.MultitagsSelectComponent do
         <%= text_input(@form, @field,
           placeholder: @placeholder,
           class:
-            "flex-1 px-2 py-3 border-0 dark:bg-slate-700 placeholder-gray-500 dark:placeholder-slate-400 outline-none focus:ring-0 text-sm",
+            "flex-1 px-2 py-3 border-0 dark:bg-slate-700 placeholder-gray-500 dark:placeholder-slate-400 outline-none focus:ring-0 text-sm md:text-base",
           autocomplete: "off",
           phx_target: @myself,
           phx_hook: "CreatePostTag"
