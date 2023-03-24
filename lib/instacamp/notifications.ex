@@ -46,7 +46,7 @@ defmodule Instacamp.Notifications do
     Notification
     |> where([n], n.user_id == ^user_id)
     |> where([n], n.inserted_at >= datetime_add(^NaiveDateTime.utc_now(), -1, "week"))
-    |> order_by([n], desc: n.id)
+    |> order_by([n], desc: n.inserted_at)
     |> preload([n], [:author])
     |> Repo.all()
   end
@@ -230,9 +230,9 @@ defmodule Instacamp.Notifications do
 
   """
   def read_all(user_id) do
-    user_notifications = from n in Notification, where: n.user_id == ^user_id
+    user_notifications_query = from(n in Notification, where: n.user_id == ^user_id)
 
-    Repo.update_all(user_notifications, set: [read: true])
+    Repo.update_all(user_notifications_query, set: [read: true])
     :ok
   end
 end
