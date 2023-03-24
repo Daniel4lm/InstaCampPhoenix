@@ -8,6 +8,7 @@ defmodule Instacamp.Accounts.User do
   import Ecto.Changeset
 
   alias Instacamp.Accounts.Follower
+  alias Instacamp.Accounts.UserSettings
   alias Instacamp.Notifications.Notification
   alias Instacamp.Posts.Bookmark
   alias Instacamp.Posts.Comment
@@ -26,14 +27,16 @@ defmodule Instacamp.Accounts.User do
     field :bio, :string
     field :confirmed_at, :naive_datetime
     field :email, :string
+    field :followers_count, :integer, default: 0
+    field :following_count, :integer, default: 0
     field :full_name, :string
     field :hashed_password, :string, redact: true
     field :location, :string
     field :password, :string, virtual: true, redact: true
-    field :username, :string
     field :posts_count, :integer, default: 0
-    field :followers_count, :integer, default: 0
-    field :following_count, :integer, default: 0
+    field :username, :string
+
+    embeds_one :settings, UserSettings, on_replace: :update
 
     has_many :comments, Comment
     has_many :following, Follower, foreign_key: :follower_id
@@ -67,7 +70,15 @@ defmodule Instacamp.Accounts.User do
   @spec registration_changeset(t(), attrs(), opts()) :: changeset()
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:avatar_url, :bio, :email, :full_name, :location, :password, :username])
+    |> cast(attrs, [
+      :avatar_url,
+      :bio,
+      :email,
+      :full_name,
+      :location,
+      :password,
+      :username
+    ])
     |> validate_user_name_and_full_name()
     |> validate_email(opts)
     |> validate_password(opts)
@@ -122,7 +133,7 @@ defmodule Instacamp.Accounts.User do
       # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
       |> maybe_hash_password(opts)
     else
-      changeset
+      cast_embed(changeset, :settings, required: true)
     end
   end
 
@@ -175,6 +186,7 @@ defmodule Instacamp.Accounts.User do
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
+    |> cast_embed(:settings, required: true)
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
   end
