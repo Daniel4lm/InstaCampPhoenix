@@ -1,18 +1,32 @@
-defmodule InstacampWeb.PostTopicHelper do
+defmodule InstacampWeb.TopicHelper do
   @moduledoc """
   This helper module contains funcions for construction of repetitive Elixir PubSub topic names.
   """
 
+  @following_topic "following:<user_id>"
   @post_bookmark_topic "post_bookmark:<post_id>"
   @post_comment_topic "post_comments:<post_id>"
-  @user_posts_topic "user_posts:<user_id>"
-  @post_or_comment_like_topic "post_or_comment_likes:<post_id>"
-  @post_topic "post:<post_id>"
   @user_notification_topic "user_notification:<user_id>"
+  @post_or_comment_like_topic "post_or_comment_likes:<post_id>"
+  @user_posts_topic "user_posts:<user_id>"
+  @post_topic "post:<post_id>"
 
   @type post_id :: Ecto.UUID.t()
   @type user_id :: Ecto.UUID.t()
   @type topic :: String.t()
+
+  @doc """
+  Returns the topic for user following.
+
+  ## Examples
+
+      iex> following_topic("user-id")
+      "following:user-id"
+
+  """
+  @spec following_topic(user_id()) :: topic()
+  def following_topic(user_id),
+    do: String.replace(@following_topic, "<user_id>", user_id)
 
   @doc """
   Returns the topic for user notification.
