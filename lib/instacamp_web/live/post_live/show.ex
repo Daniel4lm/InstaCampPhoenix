@@ -12,7 +12,7 @@ defmodule InstacampWeb.PostLive.Show do
   alias InstacampWeb.Components.Posts.TagComponent
   alias InstacampWeb.Endpoint
   alias InstacampWeb.PostLive.EditComment
-  alias InstacampWeb.PostTopicHelper
+  alias InstacampWeb.TopicHelper
   alias Phoenix.LiveView.JS
   alias Phoenix.Socket.Broadcast
 
@@ -42,27 +42,27 @@ defmodule InstacampWeb.PostLive.Show do
   defp topic_subscriptions(user_id, post_id) do
     :ok =
       post_id
-      |> PostTopicHelper.post_comment_topic()
+      |> TopicHelper.post_comment_topic()
       |> Endpoint.subscribe()
 
     :ok =
       post_id
-      |> PostTopicHelper.post_or_comment_like_topic()
+      |> TopicHelper.post_or_comment_like_topic()
       |> Endpoint.subscribe()
 
     :ok =
       post_id
-      |> PostTopicHelper.post_topic()
+      |> TopicHelper.post_topic()
       |> Endpoint.subscribe()
 
     :ok =
       post_id
-      |> PostTopicHelper.post_bookmark_topic()
+      |> TopicHelper.post_bookmark_topic()
       |> Endpoint.subscribe()
 
     :ok =
       user_id
-      |> PostTopicHelper.user_notification_topic()
+      |> TopicHelper.user_notification_topic()
       |> Endpoint.subscribe()
   end
 
@@ -117,15 +117,15 @@ defmodule InstacampWeb.PostLive.Show do
          ) do
       {:ok, comment} ->
         socket.assigns.post.id
-        |> PostTopicHelper.post_comment_topic()
+        |> TopicHelper.post_comment_topic()
         |> Endpoint.broadcast("create_post_comment", %{comment: comment})
 
         broadcast_on_update_post_comment(socket.assigns.post)
 
-        if live_action == :show do
+        if action_type[live_action] == :new do
           Endpoint.broadcast_from(
             self(),
-            PostTopicHelper.user_notification_topic(socket.assigns.post.user_id),
+            TopicHelper.user_notification_topic(socket.assigns.post.user_id),
             "notify_user",
             %{}
           )
@@ -146,7 +146,7 @@ defmodule InstacampWeb.PostLive.Show do
     {:ok, _comment} = Posts.delete_comment(comment, socket.assigns.post)
 
     socket.assigns.post.id
-    |> PostTopicHelper.post_comment_topic()
+    |> TopicHelper.post_comment_topic()
     |> Endpoint.broadcast("delete_post_comment", %{comment: comment})
 
     broadcast_on_update_post_comment(socket.assigns.post)
@@ -256,7 +256,7 @@ defmodule InstacampWeb.PostLive.Show do
 
   defp broadcast_on_update_post_comment(post) do
     post.user_id
-    |> PostTopicHelper.user_posts_topic()
+    |> TopicHelper.user_posts_topic()
     |> Endpoint.broadcast("update_post_comment", %{post_id: post.id})
   end
 

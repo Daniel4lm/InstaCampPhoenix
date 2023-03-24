@@ -8,9 +8,9 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
   alias InstacampWeb.Components.Icons
   alias InstacampWeb.Components.Posts.PostCardComponent
   alias InstacampWeb.Endpoint
-  alias InstacampWeb.PostTopicHelper
   alias InstacampWeb.SettingsLive.Components.FollowComponent
   alias InstacampWeb.SettingsLive.Components.FollowListComponent
+  alias InstacampWeb.TopicHelper
   alias Phoenix.Socket.Broadcast
 
   @impl Phoenix.LiveView
@@ -20,12 +20,17 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
     if connected?(socket) do
       :ok =
         user.id
-        |> PostTopicHelper.user_posts_topic()
+        |> TopicHelper.user_posts_topic()
         |> Endpoint.subscribe()
 
       :ok =
         user.id
-        |> PostTopicHelper.user_notification_topic()
+        |> TopicHelper.user_notification_topic()
+        |> Endpoint.subscribe()
+
+      :ok =
+        user.id
+        |> TopicHelper.following_topic()
         |> Endpoint.subscribe()
     end
 
@@ -126,6 +131,17 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
       )
       when event_name in ["like_post", "update_post_comment"] do
     {:noreply, update_post_list(socket, post_id)}
+  end
+
+  def handle_info(
+        %Phoenix.Socket.Broadcast{
+          event: "follow_user",
+          payload: %{user: updated_user},
+          topic: "following:" <> _user_id
+        } = _message,
+        socket
+      ) do
+    {:noreply, update(socket, :user, fn _user -> updated_user end)}
   end
 
   defp update_post_list(socket, post_id) do
