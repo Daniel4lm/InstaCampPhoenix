@@ -23,7 +23,7 @@ ScrollHooks.ScrollToTop = {
     }
 }
 
-ScrollHooks.UserProfileInfiniteScroll = {
+ScrollHooks.PostsPageInfiniteScroll = {
     mounted() {
 
         this.pageNumber = this.el.dataset.pageNumber
@@ -48,6 +48,28 @@ ScrollHooks.UserProfileInfiniteScroll = {
     },
     updated() {
         this.pageNumber = this.el.dataset.pageNumber
+    },
+}
+
+ScrollHooks.TrixEditorScroll = {
+    mounted() {
+        const trixToolbar = document.getElementById('trix-toolbar-1')
+        const trixEditor = document.getElementById('trix-editor')
+        const trixButtonRow = trixEditor.querySelector('.trix-button-row')
+
+        const trixEditorPos = trixEditor.getBoundingClientRect();
+
+        document.addEventListener("scroll", (event) => {
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll >= trixEditorPos.top) {
+                trixToolbar.classList.add('sticky', 'top-14')
+                trixButtonRow.classList.add('!py-0', '!bg-white', 'dark:!bg-slate-500')
+            } else {
+                trixToolbar.classList.remove('fixed', 'top-14')
+                trixButtonRow.classList.remove('!py-0', '!bg-white', 'dark:!bg-slate-500')
+            }
+        });
     },
 }
 
