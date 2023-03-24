@@ -68,7 +68,7 @@ defmodule InstacampWeb.PostListLive.SavedListComponents do
               <div class="flex flex-wrap gap-2 mt-2 md:mt-0 text-sm">
                 •
                 <%= for tag <- @post.tags do %>
-                  <%= live_redirect to: Routes.post_list_path(@socket, :index, tag.name) do %>
+                  <%= live_redirect to: Routes.feed_path(@socket, :index, %{tag: tag.name}) do %>
                     <span class="border rounded-full px-3 py-[2px] border-gray-200 dark:border-slate-400 hover:bg-sky-100 hover:border-blue-300 dark:hover:bg-inherit dark:hover:border-slate-400 cursor-pointer">
                       #<%= tag.name %>
                     </span>
