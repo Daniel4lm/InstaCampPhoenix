@@ -1,14 +1,11 @@
 <header class="relative flex justify-center items-center flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t md:border dark:border-none w-full md:rounded-2xl md:shadow-md md:shadow-slate-100 dark:shadow-none md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 pt-10 mt-10 pb-4">
-  <!-- Profile Picture Section -->
   <div class="w-full mb-4">
     <%= img_tag(@user.avatar_url,
       class:
         "w-20 h-20 md:w-28 md:h-28 bg-white dark:bg-slate-400 border-4 border-indigo-200 dark:border-slate-300 p-[0.2rem] mx-auto -mt-20 rounded-full object-cover object-center"
     ) %>
   </div>
-  <!-- END Profile Picture Section -->
 
-  <!-- User following/followers section -->
   <%= if @live_action in [:following, :followers] do %>
     <.modal
       return_to={Routes.user_profile_path(@socket, :index, @user.username)}
@@ -24,7 +21,7 @@
       />
     </.modal>
   <% end %>
-  <!-- END User following/followers section -->
+
   <section>
     <div class="sm:absolute flex flex-col md:flex-row items-center md:justify-start px-3 pt-3 sm:top-2 sm:right-2">
       <div class="my-2 md:my-0 md:ml-4">
@@ -72,14 +69,16 @@
       <% end %>
     </div>
 
-    <ul class="flex justify-center flex-wrap p-0 text-sm md:text-base">
-      <li id="profile-posts-count" class="flex items-center justify-center my-1">
-        <div class="text-indigo-500 dark:text-blue-400"><Icons.pin_icon /></div>
-        <span>Location <b><%= @user.location %></b></span>
-      </li>
+    <ul class="flex justify-center flex-wrap gap-8 p-0 text-sm md:text-base">
+      <%= if @user.location do %>
+        <li id="profile-posts-count" class="flex items-center justify-center my-1">
+          <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.pin_icon /></div>
+          <span>Location <b><%= @user.location %></b></span>
+        </li>
+      <% end %>
       <%= live_patch to: Routes.user_profile_path(@socket, :followers, @user.username) do %>
         <li
-          class="flex items-center justify-center my-1 p-2 ml-8 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500"
+          class="flex items-center justify-center my-1 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500"
           id="profile-followers-count"
         >
           <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
@@ -88,7 +87,7 @@
       <% end %>
       <%= live_patch to: Routes.user_profile_path(@socket, :following, @user.username) do %>
         <li
-          class="flex items-center justify-center my-1 p-2 ml-8 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500"
+          class="flex items-center justify-center my-1 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500"
           id="profile-following-count"
         >
           <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
@@ -99,7 +98,7 @@
   </section>
 </header>
 
-<section class="flex justify-center items-center flex-col bg-white dark:bg-slate-600 text-gray-600 dark:text-slate-100 w-full md:rounded-xl border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 py-2 md:my-4">
+<section class="flex justify-center items-center flex-col bg-white w- dark:bg-slate-600 text-gray-600 dark:text-slate-100 w-full md:rounded-xl border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 py-2 md:my-4">
   <p class="text-md md:text-lg font-semibold my-2">Recent activity</p>
 
   <ul class="flex justify-center flex-wrap p-2 text-sm md:text-base">
@@ -132,17 +131,16 @@
       </li>
     <% end %>
   </ul>
-  <!-- Posts list -->
+
   <div id="user-posts" phx-update="append" class="flex flex-col mt-9">
     <%= for post <- @user_posts do %>
-      <PostCardComponent.card socket={@socket} post={post} current_user={@current_user} />
+      <PostCardComponent.small_card socket={@socket} post={post} current_user={@current_user} />
     <% end %>
   </div>
-  <!-- End Posts list -->
 </section>
 
 <%= if @show_posts_loader? do %>
-  <div id="infinite-scroll-marker" phx-hook="UserProfileInfiniteScroll" data-page-number={@page}>
+  <div id="infinite-scroll-marker" phx-hook="PostsPageInfiniteScroll" data-page-number={@page}>
   </div>
   <div class="loader"></div>
 <% end %>
