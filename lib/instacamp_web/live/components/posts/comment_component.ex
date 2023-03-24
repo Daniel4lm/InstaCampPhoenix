@@ -19,7 +19,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
   @impl Phoenix.LiveComponent
   def render(assigns) do
     ~H"""
-    <div class="w-full my-4" id={"comment-component-#{@comment.id}"}>
+    <div class="w-full my-4" id={"comment-#{@comment.id}"}>
       <div class="relative flex flex-col border rounded-md dark:border-slate-400 p-4">
         <div class="flex items-center gap-2">
           <%= live_redirect to: Routes.user_profile_path(@socket, :index, @comment.user.username) do %>
@@ -50,6 +50,7 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
         <%= if @current_user && @current_user.id == @comment.user.id do %>
           <div class="absolute top-2 right-2 cursor-pointer">
             <div
+              id={"comments-option-#{@comment.id}"}
               class="relative rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-slate-700"
               phx-click={JS.toggle(to: "#comments-menu-#{@comment.id}")}
             >
@@ -80,12 +81,12 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
           </div>
         <% end %>
         <%= unless Enum.empty?(@related_users) do %>
-          <div id={"comment-#{@comment.id}-users-list"} class="hidden flex items-center">
+          <div id={"users-list-for-#{@comment.id}"} class="hidden flex items-center">
             <hr class="dark:border-slate-500" />
             <div class="flex items-center flex-wrap gap-2 mt-4">
               <%= for user <- @related_users do %>
                 <div
-                  id="comment-hover-item"
+                  id="user-hover-item"
                   class="relative hover-item w-max flex items-center"
                   phx-hook="ToolTip"
                 >
@@ -126,9 +127,9 @@ defmodule InstacampWeb.Components.Posts.CommentComponent do
           <% end %>
           <div
             class="flex items-center bg-gray-50 dark:bg-slate-500 p-2 ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-400 hover:cursor-pointer"
-            phx-click={JS.toggle(to: "#comment-#{@comment.id}-users-list")}
+            phx-click={JS.toggle(to: "#users-list-for-#{@comment.id}")}
           >
-            <span id={"comment-likes-count-#{@comment.id}"}><%= @comment.total_likes %> Likes</span>
+            <span id={"likes-count-for-#{@comment.id}"}><%= @comment.total_likes %> Likes</span>
           </div>
           <div class="flex items-center gap-2 p-2 ml-2 rounded-lg hover:cursor-pointer">
             <Icons.comment_icon />

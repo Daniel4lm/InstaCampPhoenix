@@ -91,7 +91,7 @@ defmodule InstacampWeb.Components.Navigation.NotificationsComponent do
         }
         class="hidden z-10 absolute bg-white dark:bg-slate-500 dark:text-slate-100 right-1/2 translate-x-1/2 md:translate-x-0 md:right-2 p-2 top-12 w-11/12 md:w-[46rem] lg:w-[56rem] border-2 border-slate-300 dark:border-slate-400 rounded-lg shadow-sm"
       >
-        <ul class="overflow-y-scroll p-2 h-96">
+        <ul class="overflow-y-scroll min-h-96">
           <%= unless any_notification_today?(@notifications) do %>
             <li class="flex flex-col justify-center items-center py-4 mb-2 border-b dark:border-slate-400">
               <Icons.all_done />

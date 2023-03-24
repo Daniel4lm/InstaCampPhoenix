@@ -22,7 +22,7 @@ defmodule InstacampWeb.SettingsLive.Components.FollowListComponent do
               <%= live_redirect to: Routes.user_profile_path(@socket, :index, get_follow_user(follow, @action).username) do %>
                 <%= img_tag(get_follow_user(follow, @action).avatar_url,
                   class:
-                    "w-10 h-10 p-[1px] border border-gray-300 rounded-full object-cover object-center"
+                    "w-8 h-8 md:w-10 md:h-10 p-[1px] border border-gray-300 rounded-full object-cover object-center"
                 ) %>
               <% end %>
 
