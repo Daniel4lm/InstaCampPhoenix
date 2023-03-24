@@ -24,14 +24,14 @@ import "phoenix_html"
 import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import ScrollHooks from "./hooks/user_profile_posts_scroll"
 import CommentTextBody from "./hooks/comment_input"
 import CopyUrlHook from "./hooks/post/copy_url"
-import TrixEditorHooks from "./hooks/trix_editor"
-import ImageUploadDragDropHook from "./hooks/drag_drop_hook"
 import CreatePostTag from "./hooks/post/post_tags"
+import ImageUploadDragDropHook from "./hooks/drag_drop_hook"
+import ScrollHooks from "./hooks/scroll_hooks"
 import ThemeHooks from "./hooks/dark_mode"
 import ToolTip from "./hooks/tooltip"
+import TrixEditorHooks from "./hooks/trix_editor"
 
 let Hooks = {
     CommentTextBody,
