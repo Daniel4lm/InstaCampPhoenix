@@ -19,20 +19,7 @@
     >
     </script>
   </head>
-  <body class="scroll-smooth bg-main-background dark:bg-slate-700 dark:text-slate-100">
+  <body class={"scroll-smooth #{if(assigns[:theme_mode], do: @theme_mode, else: "")}"}>
     <%= @inner_content %>
-
-    <script>
-      function setThemePreference() {
-        const activeTheme = localStorage.getItem("color-theme");
-        if (activeTheme == 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-      }
-
-      setThemePreference()
-    </script>
   </body>
 </html>
