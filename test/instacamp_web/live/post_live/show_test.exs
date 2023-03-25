@@ -49,14 +49,14 @@ defmodule InstacampWeb.PostLive.ShowTest do
 
       _updated_html =
         post_live
-        |> form("#comment-input-form", comment: %{body: ""})
+        |> form("#new-comment-form", comment: %{body: ""})
         |> render_submit()
 
       assert has_element?(post_live, "#post-total-comments", "0")
 
       _updated_html =
         post_live
-        |> form("#comment-input-form")
+        |> form("#new-comment-form")
         |> render_submit(
           comment: %{
             body: "Hii. This is my first comment"
@@ -70,7 +70,7 @@ defmodule InstacampWeb.PostLive.ShowTest do
       [comment] = preloaded_post_2.comment
 
       refute has_element?(post_live, "#like-component-" <> comment.id)
-      assert has_element?(post_live, "#comment-likes-count-" <> comment.id, "0")
+      assert has_element?(post_live, "#likes-count-for-" <> comment.id, "0")
     end
 
     test "user can visit his own page", %{

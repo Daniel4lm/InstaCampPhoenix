@@ -3,6 +3,8 @@ defmodule InstacampWeb.Features.PostsTest do
 
   import Instacamp.AccountsFixtures
 
+  alias Wallaby.Query
+
   setup %{sessions: [session_1, session_2]} do
     user_1 =
       user_fixture(
@@ -55,6 +57,8 @@ defmodule InstacampWeb.Features.PostsTest do
     |> wait(400)
     |> fill_in(Query.css(~s([name="post[tag]"])), with: "elixir")
     |> send_keys([:enter])
+    |> fill_in(Query.css(~s([name="post[tag]"])), with: "tz")
+    |> send_keys([:enter])
     |> assert_has(Query.css("#post-topic-elixir"))
     |> assert_text("#elixir")
     |> fill_in(Query.css(~s([name="post[tag]"])), with: "dev,")
@@ -98,7 +102,7 @@ defmodule InstacampWeb.Features.PostsTest do
     |> fill_in(Query.css(~s([name="post[tag]"])), with: "phoenix")
     |> send_keys([:enter])
     |> click(Query.button("Submit"))
-    |> assert_text("Edit Profile")
+    |> assert_has(Query.text("Edit Profile"))
     |> assert_has(Query.css(~s([id^="post-topic-"]), count: 3))
     |> assert_text("#dev")
     |> assert_text("#elixir")
@@ -162,8 +166,21 @@ defmodule InstacampWeb.Features.PostsTest do
     |> click(Query.css("[id='notifications']"))
 
     session_2
+    |> click(Query.css("[id^='comments-option-']"))
+    |> assert_text("Delete")
+    |> assert_text("Edit")
+    |> click(Query.text("Edit"))
+    |> assert_text("Editing comment")
+    |> fill_in(Query.css(~s([input="comment_body"])), with: "My edited comment")
+    |> wait(400)
+    |> click(Query.button("Save"))
+    |> assert_text("My edited comment")
+
+    session_2
     |> click(Query.css("[id^='tag-component-']"))
     |> assert_has(Query.css("[id='post-bookmarks-count']", text: "1"))
+    |> visit("/user/" <> user_2.username)
+    |> assert_text("Followers 0")
 
     session_1
     |> assert_has(Query.css("[id='post-bookmarks-count']", text: "1"))
@@ -178,7 +195,6 @@ defmodule InstacampWeb.Features.PostsTest do
     |> send_keys([:escape])
 
     session_2
-    |> visit("/user/" <> user_2.username)
     |> assert_text("Followers 1")
     |> assert_text("Following 1")
 
@@ -194,12 +210,14 @@ defmodule InstacampWeb.Features.PostsTest do
     |> send_keys([:escape])
     |> assert_text("Following 0")
     |> click(Query.link("Elixir and Phoenix development"))
-    |> assert_has(Query.css("[id^='comment-component-']", count: 1))
-    |> assert_has(Query.css("[id^='comment-likes-count-']", text: "0 Likes"))
+    |> assert_has(Query.css("[id^='comment-']", count: 1))
+    |> assert_has(Query.css("[id^='likes-count-for-']", text: "0 Likes"))
     |> click(Query.css("[id^='like-component-']"))
-    |> assert_has(Query.css("[id^='comment-likes-count-']", text: "1 Likes"))
+    |> assert_has(Query.css("[id^='likes-count-for-']", text: "1 Likes"))
 
     session_2
+    |> assert_text("Followers 0")
+    |> assert_text("Following 1")
     |> click(Query.css("[id='notifications']"))
     |> assert_text(user_1.username <> " liked your comment")
     |> click(Query.css("[id='notifications']"))

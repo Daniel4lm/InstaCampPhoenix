@@ -71,7 +71,7 @@ defmodule Instacamp.BlogTest do
       refute Enum.empty?(Posts.list_posts())
     end
 
-    test "list posts", %{user: user} do
+    test "test lists of posts", %{user: user} do
       tags = blog_tag_fixture(["nature", "winter", "city"])
 
       assert {:ok, %Posts.Post{} = post_2} =
@@ -100,6 +100,59 @@ defmodule Instacamp.BlogTest do
 
       posts_by_tag_name = Posts.search_posts_by_tag("nature")
       assert Enum.count(posts_by_tag_name) == 2
+
+      list_user_profile_posts = Posts.list_user_profile_posts(user, 1, 5)
+      assert Enum.count(list_user_profile_posts) == 3
+
+      count_post_feed_1 =
+        Posts.count_post_feed(%{
+          author: "Antonio",
+          title: nil,
+          tag: nil,
+          with_comments: false
+        })
+
+      assert count_post_feed_1 == 3
+
+      count_post_feed_2 =
+        Posts.count_post_feed(%{
+          author: "Antonio",
+          title: nil,
+          tag: nil,
+          with_comments: true
+        })
+
+      refute count_post_feed_2 == 3
+
+      count_post_feed_3 =
+        Posts.count_post_feed(%{
+          author: nil,
+          title: "nature",
+          tag: nil,
+          with_comments: false
+        })
+
+      assert count_post_feed_3 == 1
+
+      get_post_feed_1 =
+        Posts.get_post_feed(1, 2, %{
+          author: nil,
+          title: nil,
+          tag: nil,
+          with_comments: false
+        })
+
+      assert Enum.count(get_post_feed_1) == 2
+
+      get_post_feed_2 =
+        Posts.get_post_feed(2, 2, %{
+          author: nil,
+          title: nil,
+          tag: nil,
+          with_comments: false
+        })
+
+      assert Enum.count(get_post_feed_2) == 1
     end
 
     test "get_post!/1 returns the post with blog user, likes and tags preloaded", %{

@@ -7,12 +7,11 @@ defmodule InstacampWeb.Navigation.NavbarTest do
   import Instacamp.BlogFixtures
 
   alias Instacamp.Posts
-  # alias Instacamp.Repo
 
   describe "test navigation - no auth" do
     test "user can't see navigation bar", %{conn: conn} do
       {:error, {:redirect, %{flash: %{}, to: "/auth/login"}}} =
-        live(conn, Routes.live_path(conn, InstacampWeb.HomeLive))
+        live(conn, Routes.feed_path(conn, :index))
     end
   end
 
@@ -30,7 +29,7 @@ defmodule InstacampWeb.Navigation.NavbarTest do
     end
 
     test "user see navigation bar", %{conn: conn} do
-      {:ok, home_live, html} = live(conn, Routes.live_path(conn, InstacampWeb.HomeLive))
+      {:ok, home_live, html} = live(conn, Routes.feed_path(conn, :index))
 
       assert html =~ "InstaCamp"
       refute html =~ "Log In"

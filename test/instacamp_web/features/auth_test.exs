@@ -22,6 +22,7 @@ defmodule InstacampWeb.Features.AuthTest do
     session
     |> log_in_user("john@mail.org", "InValid_password")
     |> wait(400)
+    |> assert_text("Invalid email or password")
     |> log_in_user("john@mail.org", "Valid_password")
     |> wait(400)
     |> assert_text("InstaCamp")
@@ -46,14 +47,11 @@ defmodule InstacampWeb.Features.AuthTest do
     |> assert_text("Full name")
     |> assert_text("Username")
     |> fill_in(Query.css(~s([name="user[full_name]"])), with: "Joh")
-    |> wait(400)
     |> assert_text("Full name should be at least 4 character(s)")
     |> fill_in(Query.css(~s([name="user[full_name]"])), with: "John Smith")
-    |> wait(400)
     |> fill_in(Query.css(~s([name="user[location]"])), with: "London")
-    |> wait(400)
     |> fill_in(Query.css(~s([name="user[bio]"])), with: "Something about me...")
-    |> wait(400)
+    |> click(Query.css(~s([for="user-settings-form_settings_theme_mode_dark"])))
     |> attach_file(photo_field, path: "test/support/blog_image.jpg")
     |> click(Query.button("Submit"))
 
@@ -65,8 +63,6 @@ defmodule InstacampWeb.Features.AuthTest do
     session
     |> assert_has(Query.css(".alert-info"))
     |> assert_text("User updated successfully!")
-
-    session
     |> click(Query.css("[id='user-avatar']"))
     |> assert_text("John Smith")
     |> wait(1000)
