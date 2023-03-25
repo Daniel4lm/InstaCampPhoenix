@@ -31,7 +31,10 @@ module.exports = {
       colors: {
         'light-blue': colors.sky,
         cyan: colors.cyan,
-        'main-background': "#fafafa"
+        'main-background': "#fafafa",
+        gray: {
+          250: "#dbdfe3",
+        },
       },
     },
   },
