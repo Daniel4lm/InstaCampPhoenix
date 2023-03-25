@@ -24,9 +24,11 @@ defmodule InstacampWeb.LiveHooks do
   end
 
   def on_mount(:assign_user, _params, session, socket) do
-    socket = maybe_assign_user(socket, session)
+    {:cont, maybe_assign_user(socket, session)}
+  end
 
-    {:cont, socket}
+  def on_mount(:assign_theme_mode, _params, _session, socket) do
+    {:cont, maybe_change_theme_mode(socket)}
   end
 
   def on_mount(:ensure_authentication, _params, _session, socket) do
@@ -85,22 +87,23 @@ defmodule InstacampWeb.LiveHooks do
          %Phoenix.Socket.Broadcast{
            event: "notify_user",
            payload: %{},
-           topic: "user_notification:" <> _user_id
+           topic: "user_notification:" <> user_id
          } = _message,
          socket
        ) do
+    user_nofifies = Notifications.list_user_notifications(user_id)
+
     send_update(NotificationsComponent,
       id: "notifications-comp",
       current_user: socket.assigns.current_user,
-      unread_notifications?: true
+      unread_notifications?: true,
+      notifications: user_nofifies
     )
 
     {:halt, socket}
   end
 
-  defp handle_user_notifications(_message, socket) do
-    {:cont, socket}
-  end
+  defp handle_user_notifications(_message, socket), do: {:cont, socket}
 
   defp maybe_assign_user(socket, session) do
     case session do
@@ -111,6 +114,17 @@ defmodule InstacampWeb.LiveHooks do
 
       _no_token ->
         assign_new(socket, :current_user, fn -> nil end)
+    end
+  end
+
+  defp maybe_change_theme_mode(%{assigns: %{current_user: current_user}} = socket) do
+    case current_user do
+      nil ->
+        assign(socket, :theme_mode, "light")
+
+      _user ->
+        %{settings: %{theme_mode: theme_mode}} = current_user
+        assign(socket, :theme_mode, theme_mode)
     end
   end
 

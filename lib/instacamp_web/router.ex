@@ -28,13 +28,13 @@ defmodule InstacampWeb.Router do
     live_session :default,
       on_mount: [
         InstacampWeb.LiveHooks,
-        {InstacampWeb.LiveHooks, :assign_user}
+        {InstacampWeb.LiveHooks, :assign_user},
+        {InstacampWeb.LiveHooks, :assign_theme_mode}
       ],
       root_layout: {InstacampWeb.LayoutView, :root} do
-      live "/", HomeLive
+      live "/", FeedLive, :index
       live "/user/:username", SettingsLive.UserProfile, :index, as: :user_profile
       live "/user/:username/saved", SettingsLive.UserProfile, :saved, as: :user_profile
-      live "/tag/:name", PostLive.List, :index
       live "/post/:slug", PostLive.Show, :show
     end
   end
@@ -72,10 +72,11 @@ defmodule InstacampWeb.Router do
   scope "/", InstacampWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :app_auth,
+    live_session :app_settings,
       on_mount: [
         InstacampWeb.LiveHooks,
-        {InstacampWeb.LiveHooks, :assign_user}
+        {InstacampWeb.LiveHooks, :assign_user},
+        {InstacampWeb.LiveHooks, :assign_theme_mode}
       ],
       root_layout: {InstacampWeb.LayoutView, :root} do
       get "/auth/settings/confirm_email/:token", UserSettingsController, :confirm_email
@@ -84,7 +85,7 @@ defmodule InstacampWeb.Router do
       live "/user/:username/following", SettingsLive.UserProfile, :following, as: :user_profile
       live "/user/:username/followers", SettingsLive.UserProfile, :followers, as: :user_profile
       live "/saved-list", PostListLive.SavedList, :list, as: :saved_list_path
-      live "/seach-saved-list", PostListLive.SavedList, :search, as: :saved_list_path
+      live "/search-saved-list", PostListLive.SavedList, :search, as: :saved_list_path
       live "/new/post", PostLive.Form, :new
       live "/edit/post/:id", PostLive.Form, :edit
       live "/post/:slug/comments/:id/edit", PostLive.Show, :edit_comment
@@ -95,10 +96,11 @@ defmodule InstacampWeb.Router do
   scope "/", InstacampWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    live_session :more_auth,
+    live_session :app_auth,
       on_mount: [
         InstacampWeb.LiveHooks,
-        {InstacampWeb.LiveHooks, :assign_user}
+        {InstacampWeb.LiveHooks, :assign_user},
+        {InstacampWeb.LiveHooks, :assign_theme_mode}
       ],
       root_layout: {InstacampWeb.LayoutView, :root} do
       live "/auth/signup", UserAuthLive.SignUp, :new
