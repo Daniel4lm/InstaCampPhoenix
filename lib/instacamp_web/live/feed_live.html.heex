@@ -63,6 +63,7 @@
         <div
           id="reset_button"
           class="reset_form_button px-6 py-2 border-none rounded-full text-center font-medium bg-transparent text-gray-500 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-400 cursor-pointer"
+          {if(Enum.empty?(@streams.post_feed.inserts), do: [phx_click: "clear_form"], else: [])}
         >
           <span>Reset filter</span>
         </div>

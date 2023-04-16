@@ -64,6 +64,10 @@ defmodule InstacampWeb.FeedLive do
      |> patch_page(url_params)}
   end
 
+  def handle_event("clear_form", _params, socket) do
+    {:noreply, patch_page(socket)}
+  end
+
   def handle_event("assign_stream_ids", %{"ids_list" => ids_list}, socket) do
     {:noreply, assign(socket, :stream_ids, ids_list)}
   end
