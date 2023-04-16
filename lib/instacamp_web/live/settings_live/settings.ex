@@ -71,7 +71,7 @@ defmodule InstacampWeb.SettingsLive.Settings do
 
   def handle_event("update_settings", %{"user" => user_params}, socket) do
     user = socket.assigns.current_user
-    # "priv/static/uploads/avatars"
+
     file_path =
       FileHandler.maybe_upload_image(
         socket,

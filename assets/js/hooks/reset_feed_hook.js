@@ -1,6 +1,5 @@
 export default {
     mounted() {
-        // let postFeedList = document.getElementById("posts-feed")
         let postFeedList = this.el
         let children = postFeedList.children;
         let submitButton = document.getElementById("submit-button")

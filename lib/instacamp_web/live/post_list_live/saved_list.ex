@@ -32,7 +32,6 @@ defmodule InstacampWeb.PostListLive.SavedList do
       |> assign_reading_list()
       |> assign(:search_list, [])
       |> assign(:setting_tabs, setting_tabs)
-      #  |> set_load_more_posts()
     }
   end
 
