@@ -28,7 +28,7 @@ ScrollHooks.PostsPageInfiniteScroll = {
 
         this.pageNumber = this.el.dataset.pageNumber
         this.observer = new IntersectionObserver((entries) => {
-            const target = entries[0];
+            const target = entries[0]
             if (target.isIntersecting) {
                 setTimeout(() => {
                     this.pageNumber = parseInt(this.pageNumber) + 1
@@ -40,7 +40,7 @@ ScrollHooks.PostsPageInfiniteScroll = {
                 root: null, // window by default
                 rootMargin: "0px",
                 threshold: 1.0,
-            });
+            })
         this.observer.observe(this.el)
     },
     beforeDestroy() {
@@ -59,7 +59,7 @@ ScrollHooks.TrixEditorScroll = {
         const trixEditorPos = trixEditorContainer.getBoundingClientRect()
 
         document.addEventListener("scroll", (event) => {
-            const currentScroll = window.pageYOffset;
+            const currentScroll = window.pageYOffset
             if (currentScroll >= trixEditorPos.top) {
                 trixToolbar.classList.add('sticky', 'top-14', 'z-50', 'bg-white', 'border-b', 'border-gray-500', 'dark:bg-slate-500')
             } else {

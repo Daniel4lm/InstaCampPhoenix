@@ -12,7 +12,7 @@ export default {
                     if (tag.length > 0) {
                         this.pushEvent('add-item', tag)
                     }
-                });
+                })
                 e.target.value = ''
             }
         });
