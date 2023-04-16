@@ -19,12 +19,9 @@ defmodule InstacampWeb.PostListLive.SavedList do
       |> TopicHelper.user_notification_topic()
       |> Endpoint.subscribe()
 
-    saved_list_path = Routes.saved_list_path_path(socket, :list)
-    search_list_path = Routes.saved_list_path_path(socket, :search)
-
     setting_tabs = [
-      %{title: "Saved list", path: saved_list_path},
-      %{title: "Search", path: search_list_path}
+      %{title: "Saved list", path: ~p"/saved-list"},
+      %{title: "Search", path: ~p"/search-saved-list"}
     ]
 
     {

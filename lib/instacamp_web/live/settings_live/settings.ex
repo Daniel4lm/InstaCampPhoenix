@@ -12,11 +12,24 @@ defmodule InstacampWeb.SettingsLive.Settings do
   @type socket :: Phoenix.LiveView.Socket.t()
 
   @impl Phoenix.LiveView
+  def mount(%{"token" => token}, _session, socket) do
+    socket =
+      case Accounts.update_user_email(socket.assigns.current_user, token) do
+        :ok ->
+          put_flash(socket, :info, "Email changed successfully.")
+
+        :error ->
+          put_flash(socket, :error, "Email change link is invalid or it has expired.")
+      end
+
+    {:ok, push_navigate(socket, to: ~p"/accounts/edit")}
+  end
+
   def mount(_params, _session, socket) do
     user_changeset = Accounts.change_user(socket.assigns.current_user)
 
-    settings_path = Routes.live_path(socket, __MODULE__)
-    pass_settings_path = Routes.live_path(socket, InstacampWeb.SettingsLive.PassSettings)
+    settings_path = ~p"/accounts/edit"
+    pass_settings_path = ~p"/accounts/password/change"
 
     {:ok,
      socket
@@ -58,13 +71,13 @@ defmodule InstacampWeb.SettingsLive.Settings do
 
   def handle_event("update_settings", %{"user" => user_params}, socket) do
     user = socket.assigns.current_user
-
+    # "priv/static/uploads/avatars"
     file_path =
       FileHandler.maybe_upload_image(
         socket,
-        "/uploads/avatars",
-        "priv/static/uploads/avatars",
-        :avatar_url
+        "priv/uploads/avatars",
+        :avatar_url,
+        socket.assigns.current_user.avatar_url
       )
 
     params_with_avatar =
@@ -75,7 +88,7 @@ defmodule InstacampWeb.SettingsLive.Settings do
         {:noreply,
          socket
          |> put_flash(:info, "User updated successfully!")
-         |> redirect(to: Routes.live_path(socket, InstacampWeb.SettingsLive.Settings))}
+         |> redirect(to: socket.assigns.settings_path)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :user_changeset, changeset)}

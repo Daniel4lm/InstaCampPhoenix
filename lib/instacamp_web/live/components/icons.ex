@@ -17,7 +17,7 @@ defmodule InstacampWeb.Components.Icons do
       stroke="currentColor"
       width="24"
       height="24"
-      class="md:w-7 md:h-7"
+      class="lg:w-7 lg:h-7"
     >
       <path
         stroke-linecap="round"
@@ -25,6 +25,78 @@ defmodule InstacampWeb.Components.Icons do
         stroke-width="1.4"
         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
       />
+    </svg>
+    """
+  end
+
+  @spec app_icon(assigns()) :: render()
+  def app_icon(assigns) do
+    ~H"""
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5 md:w-6 md:h-6"
+    >
+      <g clip-path="url(#clip0_1514_10)">
+        <path
+          d="M6 1H3C1.89543 1 1 1.89543 1 3V6C1 7.10457 1.89543 8 3 8H6C7.10457 8 8 7.10457 8 6V3C8 1.89543 7.10457 1 6 1Z"
+          fill="#6B78F3"
+          stroke="#6B78F3"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M17 1H14C12.8954 1 12 1.89543 12 3V6C12 7.10457 12.8954 8 14 8H17C18.1046 8 19 7.10457 19 6V3C19 1.89543 18.1046 1 17 1Z"
+          fill="#B1B8F8"
+          stroke="#B1B8F8"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M17 12H14C12.8954 12 12 12.8954 12 14V17C12 18.1046 12.8954 19 14 19H17C18.1046 19 19 18.1046 19 17V14C19 12.8954 18.1046 12 17 12Z"
+          fill="#6B78F3"
+          stroke="#6B78F3"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M6 12H3C1.89543 12 1 12.8954 1 14V17C1 18.1046 1.89543 19 3 19H6C7.10457 19 8 18.1046 8 17V14C8 12.8954 7.10457 12 6 12Z"
+          fill="#B1B8F8"
+          stroke="#B1B8F8"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1514_10">
+          <rect width="20" height="20" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+    """
+  end
+
+  @spec hamb_button(assigns()) :: render()
+  def hamb_button(assigns) do
+    ~H"""
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5"
+    >
+      <path d="M2 16H30" stroke="currentColor" stroke-width="3" />
+      <path d="M2 24H30" stroke="currentColor" stroke-width="3" />
+      <path d="M2 8H30" stroke="currentColor" stroke-width="3" />
     </svg>
     """
   end
@@ -87,6 +159,76 @@ defmodule InstacampWeb.Components.Icons do
     """
   end
 
+  @spec hidden_icon(assigns()) :: render()
+  def hidden_icon(assigns) do
+    ~H"""
+    <svg
+      id={"show-password-icon-#{@id}"}
+      viewBox="0 0 16 14"
+      width="100%"
+      height="100%"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_1601_2)">
+        <path
+          d="M0.666626 6.99993C0.666626 6.99993 3.33329 1.25635 7.99996 1.25635C12.6666 1.25635 15.3333 6.99993 15.3333 6.99993C15.3333 6.99993 12.6666 12.7435 7.99996 12.7435C3.33329 12.7435 0.666626 6.99993 0.666626 6.99993Z"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8 9.15388C9.10457 9.15388 10 8.18957 10 7.00004C10 5.8105 9.10457 4.84619 8 4.84619C6.89543 4.84619 6 5.8105 6 7.00004C6 8.18957 6.89543 9.15388 8 9.15388Z"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1601_2">
+          <rect width="16" height="14" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+
+    <svg
+      id={"hide-password-icon-#{@id}"}
+      style="display: none;"
+      width="100%"
+      height="100%"
+      viewBox="0 0 16 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_1034_2)">
+        <path
+          d="M0.666626 6.99993C0.666626 6.99993 3.33329 1.25635 7.99996 1.25635C12.6666 1.25635 15.3333 6.99993 15.3333 6.99993C15.3333 6.99993 12.6666 12.7435 7.99996 12.7435C3.33329 12.7435 0.666626 6.99993 0.666626 6.99993Z"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8 9.15388C9.10457 9.15388 10 8.18957 10 7.00004C10 5.8105 9.10457 4.84619 8 4.84619C6.89543 4.84619 6 5.8105 6 7.00004C6 8.18957 6.89543 9.15388 8 9.15388Z"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M13 1L1.99996 13"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1034_2">
+          <rect width="16" height="14" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+    """
+  end
+
   @spec globe_icon(assigns()) :: render()
   def globe_icon(assigns) do
     ~H"""
@@ -118,7 +260,7 @@ defmodule InstacampWeb.Components.Icons do
       stroke="currentColor"
       width="24"
       height="24"
-      class="md:w-7 md:h-7"
+      class="lg:w-7 lg:h-7"
     >
       <path
         stroke-linecap="round"
@@ -222,7 +364,7 @@ defmodule InstacampWeb.Components.Icons do
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      class="w-5 sm:w-6"
+      class="w-5 h-5 sm:w-6 sm:h-6"
     >
       <path
         d="M10 3H14C16.1217 3 18.1566 3.84285 19.6569 5.34315C21.1571 6.84344 22 8.87827 22 11C22 13.1217 21.1571 15.1566 19.6569 16.6569C18.1566 18.1571 16.1217 19 14 19V22.5C9 20.5 2 17.5 2 11C2 8.87827 2.84285 6.84344 4.34315 5.34315C5.84344 3.84285 7.87827 3 10 3V3ZM12 17H14C15.5913 17 17.1174 16.3679 18.2426 15.2426C19.3679 14.1174 20 12.5913 20 11C20 9.4087 19.3679 7.88258 18.2426 6.75736C17.1174 5.63214 15.5913 5 14 5H10C8.4087 5 6.88258 5.63214 5.75736 6.75736C4.63214 7.88258 4 9.4087 4 11C4 14.61 6.462 16.966 12 19.48V17Z"
@@ -279,7 +421,14 @@ defmodule InstacampWeb.Components.Icons do
   @spec like_icon(assigns()) :: render()
   def like_icon(assigns) do
     ~H"""
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5 sm:w-6 sm:h-6"
+    >
       <path
         d="M20.4855 12.8085L12.0001 21.2929L3.35066 12.6435L3.20065 12.4685C2.32318 11.4452 1.81585 10.1563 1.76044 8.80945C1.70504 7.4626 2.10478 6.13634 2.89523 5.04444C3.68568 3.95254 4.8208 3.15863 6.11759 2.79068C6.70144 2.62501 7.73313 2.65356 8.78654 2.92346C9.58223 3.12733 10.31 3.44852 10.8227 3.85373L11.2707 4.30179L11.5996 4.72366L11.9997 4.32358C13.1248 3.19828 14.651 2.566 16.2423 2.56592C17.8336 2.56583 19.3598 3.1979 20.4851 4.32307C21.6104 5.44824 22.2426 6.97435 22.2427 8.56567C22.2428 10.157 21.6107 11.6831 20.4856 12.8084C20.4855 12.8084 20.4855 12.8084 20.4855 12.8085Z"
         fill={if(@liked, do: "#dc2626", else: "currentColor")}
@@ -294,7 +443,14 @@ defmodule InstacampWeb.Components.Icons do
   @spec heart_icon(assigns()) :: render()
   def heart_icon(assigns) do
     ~H"""
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5 sm:w-6 sm:h-6"
+    >
       <path
         d="M20.4855 12.8085L12.0001 21.2929L3.35066 12.6435L3.20065 12.4685C2.32318 11.4452 1.81585 10.1563 1.76044 8.80945C1.70504 7.4626 2.10478 6.13634 2.89523 5.04444C3.68568 3.95254 4.8208 3.15863 6.11759 2.79068C6.70144 2.62501 7.73313 2.65356 8.78654 2.92346C9.58223 3.12733 10.31 3.44852 10.8227 3.85373L11.2707 4.30179L11.5996 4.72366L11.9997 4.32358C13.1248 3.19828 14.651 2.566 16.2423 2.56592C17.8336 2.56583 19.3598 3.1979 20.4851 4.32307C21.6104 5.44824 22.2426 6.97435 22.2427 8.56567C22.2428 10.157 21.6107 11.6831 20.4856 12.8084C20.4855 12.8084 20.4855 12.8084 20.4855 12.8085Z"
         fill="currentColor"
@@ -315,7 +471,7 @@ defmodule InstacampWeb.Components.Icons do
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      class="w-5 sm:w-6"
+      class="w-5 h-5 sm:w-6 sm:h-6"
     >
       <path
         stroke-linecap="round"
@@ -337,6 +493,7 @@ defmodule InstacampWeb.Components.Icons do
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
+      class="w-5 h-5 sm:w-6 sm:h-6"
     >
       <path
         stroke-linecap="round"
@@ -377,7 +534,14 @@ defmodule InstacampWeb.Components.Icons do
   @spec new_tag_icon(assigns()) :: render()
   def new_tag_icon(assigns) do
     ~H"""
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5 sm:w-6 sm:h-6"
+    >
       <mask id="path-1-inside-1_1404_2" fill="white">
         <path d="M19.4285 0.571685C19.4285 0.420132 19.4887 0.274787 19.5959 0.167624C19.7031 0.06046 19.8484 0.000256016 20 0.000256016C20.1515 0.000256016 20.2969 0.06046 20.404 0.167624C20.5112 0.274787 20.5714 0.420132 20.5714 0.571685V3.42883H23.4285C23.5801 3.42883 23.7254 3.48903 23.8326 3.5962C23.9398 3.70336 24 3.8487 24 4.00026C24 4.15181 23.9398 4.29715 23.8326 4.40432C23.7254 4.51148 23.5801 4.57168 23.4285 4.57168H20.5714V7.42883C20.5714 7.58038 20.5112 7.72573 20.404 7.83289C20.2969 7.94005 20.1515 8.00026 20 8.00026C19.8484 8.00026 19.7031 7.94005 19.5959 7.83289C19.4887 7.72573 19.4285 7.58038 19.4285 7.42883V4.57168H16.5714C16.4198 4.57168 16.2745 4.51148 16.1673 4.40432C16.0602 4.29715 16 4.15181 16 4.00026C16 3.8487 16.0602 3.70336 16.1673 3.5962C16.2745 3.48903 16.4198 3.42883 16.5714 3.42883H19.4285V0.571685Z" />
       </mask>
@@ -424,7 +588,7 @@ defmodule InstacampWeb.Components.Icons do
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
-        stroke-width="1"
+        stroke-width="1.4"
         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
       />
     </svg>
@@ -434,7 +598,14 @@ defmodule InstacampWeb.Components.Icons do
   @spec notify_icon(assigns()) :: render()
   def notify_icon(assigns) do
     ~H"""
-    <svg width="20" height="24" viewBox="0 0 20 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="20"
+      height="24"
+      viewBox="0 0 20 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="lg:w-7 lg:h-7"
+    >
       <path
         d="M10 24C11.5768 24 12.8558 22.657 12.8558 21H7.1442C7.1442 22.657 8.42322 24 10 24ZM19.6156 16.9823C18.7531 16.0092 17.1393 14.5453 17.1393 9.75C17.1393 6.10781 14.7071 3.19219 11.4277 2.47688V1.5C11.4277 0.671719 10.7884 0 10 0C9.21161 0 8.57233 0.671719 8.57233 1.5V2.47688C5.29287 3.19219 2.86074 6.10781 2.86074 9.75C2.86074 14.5453 1.2469 16.0092 0.384405 16.9823C0.116548 17.2847 -0.00220127 17.6461 3.08654e-05 18C0.00494156 18.7687 0.579493 19.5 1.43306 19.5H18.5669C19.4205 19.5 19.9955 18.7687 20 18C20.0022 17.6461 19.8835 17.2842 19.6156 16.9823Z"
         fill="currentColor"

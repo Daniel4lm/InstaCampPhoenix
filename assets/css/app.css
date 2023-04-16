@@ -105,10 +105,7 @@ h6 {
 }
 
 .phx-modal-close {
-  /* color: #aaa; */
   float: right;
-  font-size: 28px;
-  font-weight: bold;
 }
 
 .phx-modal-close:hover,
@@ -161,7 +158,7 @@ h6 {
 }
 
 .invalid-feedback {
-  @apply text-[#B9121C] block m-2 dark:text-red-500;
+  @apply text-[#B9121C] block my-2 dark:text-red-500;
   animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
 }
 
@@ -184,7 +181,8 @@ h6 {
   display: none; /* Chrome, Safari, Opera */
 }
 
-#post-body > pre {
+#post-body > pre,
+trix-editor > pre {
   @apply block text-[0.7em] sm:text-[0.8em] md:text-[0.95em] text-[#ccc] rounded-lg bg-[#2d2d2d] my-2 whitespace-pre-wrap break-words leading-5 py-3 px-2;
 }
 
@@ -209,7 +207,7 @@ trix-editor:focus {
 }
 
 trix-editor::placeholder {
-  @apply dark:text-slate-400;
+  @apply dark:text-slate-100;
 }
 
 trix-editor > ol,
@@ -251,7 +249,7 @@ trix-editor > ol > li,
 }
 
 trix-toolbar .trix-button-row {
-  @apply overflow-y-hidden pl-1 pr-1 mb-1 border rounded-md dark:border-slate-500;
+  @apply overflow-y-hidden pl-1 pr-1 mb-1;
 }
 
 trix-toolbar .trix-button-group {

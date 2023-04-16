@@ -1,11 +1,11 @@
 <section class="w-full md:w-3/4 xl:w-2/3 flex flex-col mx-auto mb-4">
   <.form
-    let={f}
+    :let={f}
     for={@post_changeset}
     id="post-new-form"
     phx-submit="save_post"
     phx-change="validate_post"
-    class="relative w-full bg-white dark:bg-slate-600 dark:text-slate-100 border-t border-b md:border border-gray-200 dark:border-0 shadow-md shadow-slate-200 dark:shadow-none md:rounded-2xl py-8 space-y-10 md:space-y-8"
+    class="relative w-full bg-white dark:bg-slate-600 dark:text-slate-100 border-t border-b md:border border-gray-200 dark:border-0 shadow-md shadow-slate-200 dark:shadow-none md:rounded-2xl py-4 md:py-8 space-y-4 md:space-y-8"
   >
     <h2 class="w-full md:w-3/4 px-4 md:px-0 mx-auto text-xl md:text-2xl">
       <%= @page_title %>
@@ -16,16 +16,16 @@
         id="drag-drop-container"
         phx-hook="ImageUploadDragDropHook"
         class="w-full md:w-3/4 border border-gray-200 dark:border-slate-400 rounded-xl mx-auto mb-4 py-4 px-4 text-center flex flex-col justify-center items-center min-h-[220px]"
-        phx-drop-target={@uploads.photo_url.ref}
+        phx-drop-target={@uploads.post_photo_url.ref}
       >
-        <%= if Enum.empty?(@uploads.photo_url.entries) do %>
+        <%= if Enum.empty?(@uploads.post_photo_url.entries) do %>
           <p class="drag-sub-el font-bold text-md md:text-xl mb-3">
             Upload your image
           </p>
           <p class="drag-sub-el text-sm md:text-base font-thin text-gray-400">
             Your file must be in JPG or PNG format
           </p>
-          <label for={@uploads.photo_url.ref} class="flex cursor-pointer justify-center my-8">
+          <label for={@uploads.post_photo_url.ref} class="flex cursor-pointer justify-center my-8">
             <Icons.upload />
           </label>
           <p class="drag-sub-el text-sm md:text-base font-thin text-gray-400">
@@ -33,10 +33,13 @@
           </p>
         <% end %>
 
-        <%= for entry <- @uploads.photo_url.entries do %>
+        <%= for entry <- @uploads.post_photo_url.entries do %>
           <div id="blog-image" class="relative py-4 mx-4">
             <div class="flex justify-center">
-              <label for={@uploads.photo_url.ref} class="flex cursor-pointer justify-center mb-8">
+              <label
+                for={@uploads.post_photo_url.ref}
+                class="flex cursor-pointer justify-center mb-8"
+              >
                 <%= if entry.valid? do %>
                   <Icons.upload />
                 <% else %>
@@ -46,7 +49,7 @@
             </div>
             <div class="w-max mx-auto my-2 relative flex items-center pl-4 py-[0.2rem] pr-2 rounded-2xl sm:rounded-full bg-indigo-400 text-white">
               <label class="text-[0.9rem]">
-                <%= hd(@uploads.photo_url.entries).client_name %>
+                <%= hd(@uploads.post_photo_url.entries).client_name %>
               </label>
               <div
                 name="cancel-image-upload"
@@ -61,12 +64,12 @@
           </div>
         <% end %>
 
-        <%= live_file_input(@uploads.photo_url, class: "sr-only") %>
+        <%= live_file_input(@uploads.post_photo_url, class: "sr-only") %>
       </div>
 
-      <%= for {_ref, _err} <- @uploads.photo_url.errors do %>
+      <%= for {_ref, _err} <- @uploads.post_photo_url.errors do %>
         <div class="invalid-feedback">
-          <%= FileHandler.check_image_format(hd(@uploads.photo_url.entries).client_name) %>
+          <%= FileHandler.check_image_format(hd(@uploads.post_photo_url.entries).client_name) %>
         </div>
       <% end %>
     </div>
@@ -80,9 +83,8 @@
           phx_debounce: "blur",
           autocomplete: "off"
         ) %>
-        <div class="absolute top-full -translate-y-1">
-          <%= error_tag(f, :title) %>
-        </div>
+
+        <%= error_tag(f, :title) %>
       </div>
     </div>
 
@@ -112,9 +114,7 @@
           >
           </trix-editor>
         </div>
-        <div class="absolute top-full -translate-y-1">
-          <%= error_tag(f, :body) %>
-        </div>
+        <%= error_tag(f, :body) %>
       </div>
     </div>
 

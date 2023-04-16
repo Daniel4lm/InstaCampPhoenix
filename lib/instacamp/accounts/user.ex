@@ -35,6 +35,7 @@ defmodule Instacamp.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :posts_count, :integer, default: 0
     field :username, :string
+    field :website, :string
 
     embeds_one :settings, UserSettings, on_replace: :update
 
@@ -77,7 +78,8 @@ defmodule Instacamp.Accounts.User do
       :full_name,
       :location,
       :password,
-      :username
+      :username,
+      :website
     ])
     |> validate_user_name_and_full_name()
     |> validate_email(opts)

@@ -8,12 +8,15 @@ defmodule Instacamp.Application do
   @impl Application
   def start(_type, _args) do
     children = [
-      # Start the Ecto repository
-      Instacamp.Repo,
       # Start the Telemetry supervisor
       InstacampWeb.Telemetry,
+      # Start the Ecto repository
+      Instacamp.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: Instacamp.PubSub},
+      # Start Finch
+      {Finch, name: Instacamp.Finch},
+      {Finch, name: Swoosh.Finch},
       # Start the Endpoint (http/https)
       InstacampWeb.Endpoint
       # Start a worker by calling: Instacamp.Worker.start_link(arg)

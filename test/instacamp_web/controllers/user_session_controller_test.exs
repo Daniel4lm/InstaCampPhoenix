@@ -10,7 +10,7 @@ defmodule InstacampWeb.UserSessionControllerTest do
   describe "POST /users/log_in" do
     test "logs the user in", %{conn: conn, user: user} do
       conn =
-        post(conn, Routes.user_session_path(conn, :create), %{
+        post(conn, ~p"/auth/login", %{
           "user" => %{"email" => user.email, "password" => valid_user_password()}
         })
 
@@ -27,7 +27,7 @@ defmodule InstacampWeb.UserSessionControllerTest do
 
     test "logs the user in with remember me", %{conn: conn, user: user} do
       conn =
-        post(conn, Routes.user_session_path(conn, :create), %{
+        post(conn, ~p"/auth/login", %{
           "user" => %{
             "email" => user.email,
             "password" => valid_user_password(),
@@ -36,14 +36,14 @@ defmodule InstacampWeb.UserSessionControllerTest do
         })
 
       assert conn.resp_cookies["_instacamp_web_user_remember_me"]
-      assert redirected_to(conn) == "/"
+      assert redirected_to(conn) == ~p"/"
     end
 
     test "logs the user in with return to", %{conn: conn, user: user} do
       conn =
         conn
         |> init_test_session(user_return_to: "/foo/bar")
-        |> post(Routes.user_session_path(conn, :create), %{
+        |> post(~p"/auth/login", %{
           "user" => %{
             "email" => user.email,
             "password" => valid_user_password()
@@ -51,32 +51,33 @@ defmodule InstacampWeb.UserSessionControllerTest do
         })
 
       assert redirected_to(conn) == "/foo/bar"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
     end
 
     test "emits error message with invalid credentials", %{conn: conn, user: user} do
       conn =
-        post(conn, Routes.user_session_path(conn, :create), %{
+        post(conn, ~p"/auth/login", %{
           "user" => %{"email" => user.email, "password" => "invalid_password"}
         })
 
-      assert redirected_to(conn) == Routes.user_auth_login_path(conn, :new)
-      assert get_flash(conn, :error) =~ "Invalid email or password"
+      assert redirected_to(conn) == ~p"/auth/login"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "Invalid email or password"
     end
   end
 
   describe "DELETE /users/log_out" do
     test "logs the user out", %{conn: conn, user: user} do
-      conn = conn |> log_in_user(user) |> delete(Routes.user_session_path(conn, :delete))
+      conn = conn |> log_in_user(user) |> delete(~p"/auth/logout")
       assert redirected_to(conn) == "/"
       refute get_session(conn, :user_token)
-      assert get_flash(conn, :info) =~ "Logged out successfully"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Logged out successfully"
     end
 
     test "succeeds even if the user is not logged in", %{conn: conn} do
-      conn = delete(conn, Routes.user_session_path(conn, :delete))
+      conn = delete(conn, ~p"/auth/logout")
       assert redirected_to(conn) == "/"
       refute get_session(conn, :user_token)
-      assert get_flash(conn, :info) =~ "Logged out successfully"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Logged out successfully"
     end
   end
 end

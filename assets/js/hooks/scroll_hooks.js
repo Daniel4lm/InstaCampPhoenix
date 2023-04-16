@@ -53,23 +53,19 @@ ScrollHooks.PostsPageInfiniteScroll = {
 
 ScrollHooks.TrixEditorScroll = {
     mounted() {
-        const trixToolbar = document.getElementById('trix-toolbar-1')
-        const trixEditor = document.getElementById('trix-editor')
-        const trixButtonRow = trixEditor.querySelector('.trix-button-row')
+        const trixEditorContainer = this.el
+        const trixToolbar = trixEditorContainer.querySelector('trix-toolbar')
 
-        const trixEditorPos = trixEditor.getBoundingClientRect();
+        const trixEditorPos = trixEditorContainer.getBoundingClientRect()
 
         document.addEventListener("scroll", (event) => {
             const currentScroll = window.pageYOffset;
-
             if (currentScroll >= trixEditorPos.top) {
-                trixToolbar.classList.add('sticky', 'top-14')
-                trixButtonRow.classList.add('!py-0', '!bg-white', 'dark:!bg-slate-500')
+                trixToolbar.classList.add('sticky', 'top-14', 'z-50', 'bg-white', 'border-b', 'border-gray-500', 'dark:bg-slate-500')
             } else {
-                trixToolbar.classList.remove('fixed', 'top-14')
-                trixButtonRow.classList.remove('!py-0', '!bg-white', 'dark:!bg-slate-500')
+                trixToolbar.classList.remove('sticky', 'top-14', 'z-50', 'bg-white', 'border-b', 'border-gray-500', 'dark:bg-slate-500')
             }
-        });
+        })
     },
 }
 

@@ -11,7 +11,7 @@ defmodule InstacampWeb.UserResetPasswordLiveTest do
 
   describe "/reset-password" do
     test "sends a new reset password token when email exists", %{conn: conn, user: user} do
-      {:ok, live, _html} = live(conn, Routes.user_reset_password_path(conn, :new))
+      {:ok, live, _html} = live(conn, ~p"/auth/reset-password")
 
       assert live
              |> form("#user-form", user: %{email: user.email})
@@ -21,7 +21,7 @@ defmodule InstacampWeb.UserResetPasswordLiveTest do
     end
 
     test "does not send reset password token if email is invalid", %{conn: conn} do
-      {:ok, live, _html} = live(conn, Routes.user_reset_password_path(conn, :new))
+      {:ok, live, _html} = live(conn, ~p"/auth/reset-password")
 
       assert live
              |> form("#user-form", user: %{email: "inexistent@email.com"})
@@ -42,7 +42,7 @@ defmodule InstacampWeb.UserResetPasswordLiveTest do
     end
 
     test "resets password", %{conn: conn, user: user, token: token} do
-      {:ok, live, _html} = live(conn, Routes.user_reset_password_path(conn, :edit, token))
+      {:ok, live, _html} = live(conn, ~p"/auth/reset-password/#{token}")
 
       assert live
              |> form("#user-change-pass-form", user: %{})
@@ -54,17 +54,19 @@ defmodule InstacampWeb.UserResetPasswordLiveTest do
           user: %{password: "n3W_valid_password", password_confirmation: "n3W_valid_password"}
         )
         |> render_submit()
-        |> follow_redirect(conn, Routes.user_auth_login_path(conn, :new))
+        |> follow_redirect(conn, ~p"/auth/login")
 
       refute get_session(conn, :user_token)
-      assert get_flash(conn, :info) =~ "Password reset successfully"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Password reset successfully"
       assert Accounts.get_user_by_email_and_password(user.email, "n3W_valid_password")
     end
 
     test "shows error message with invalid token", %{conn: conn} do
-      conn = get(conn, Routes.user_reset_password_path(conn, :edit, "oops"))
-      assert redirected_to(conn) == "/"
-      assert get_flash(conn, :error) =~ "Reset password link is invalid or it has expired"
+      conn = get(conn, ~p"/auth/reset-password/oops")
+      assert redirected_to(conn) == ~p"/"
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~
+               "Reset password link is invalid or it has expired"
     end
   end
 

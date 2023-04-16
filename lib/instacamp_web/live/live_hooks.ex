@@ -3,12 +3,14 @@ defmodule InstacampWeb.LiveHooks do
     Live Hooks module
 
   """
+  use InstacampWeb, :verified_routes
+
+  import Phoenix.Component
   import Phoenix.LiveView
 
   alias Instacamp.Accounts
   alias Instacamp.Notifications
   alias InstacampWeb.Components.Navigation.NotificationsComponent
-  alias InstacampWeb.Router.Helpers, as: Routes
   alias Phoenix.Ecto.SQL.Sandbox
 
   @type socket :: Phoenix.LiveView.Socket.t()
@@ -27,20 +29,31 @@ defmodule InstacampWeb.LiveHooks do
     {:cont, maybe_assign_user(socket, session)}
   end
 
-  def on_mount(:assign_theme_mode, _params, _session, socket) do
-    {:cont, maybe_change_theme_mode(socket)}
+  def on_mount(:assign_theme_mode, _params, session, socket) do
+    updated_socket = maybe_assign_user(socket, session)
+
+    {:cont, maybe_change_theme_mode(updated_socket)}
   end
 
-  def on_mount(:ensure_authentication, _params, _session, socket) do
-    case socket.assigns.current_user do
+  def on_mount(:ensure_authentication, _params, session, socket) do
+    updated_socket = maybe_assign_user(socket, session)
+
+    case updated_socket.assigns.current_user do
       nil ->
-        {:halt,
-         socket
-         |> put_flash(:info, "You must log in to access this page.")
-         |> redirect(to: Routes.user_auth_sign_up_path(socket, :new))}
+        {:halt, redirect(updated_socket, to: ~p"/auth/login")}
 
       %Accounts.User{} ->
-        {:cont, socket}
+        {:cont, updated_socket}
+    end
+  end
+
+  def on_mount(:redirect_if_user_is_authenticated, _params, session, socket) do
+    updated_socket = maybe_assign_user(socket, session)
+
+    if updated_socket.assigns.current_user do
+      {:halt, redirect(updated_socket, to: ~p"/")}
+    else
+      {:cont, updated_socket}
     end
   end
 
@@ -120,7 +133,7 @@ defmodule InstacampWeb.LiveHooks do
   defp maybe_change_theme_mode(%{assigns: %{current_user: current_user}} = socket) do
     case current_user do
       nil ->
-        assign(socket, :theme_mode, "light")
+        assign(socket, :theme_mode, :light)
 
       _user ->
         %{settings: %{theme_mode: theme_mode}} = current_user

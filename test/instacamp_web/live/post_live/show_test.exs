@@ -16,6 +16,7 @@ defmodule InstacampWeb.PostLive.ShowTest do
     } do
       {:ok, post_live, html} = live(conn, Routes.post_show_path(conn, :show, post_2.slug))
 
+      assert page_title(post_live) =~ post_2.title
       assert html =~ user_2.full_name
       assert html =~ DateTimeHelper.format_post_date(post_2.updated_at)
       assert html =~ "Damirs post"

@@ -1,0 +1,49 @@
+<InstacampWeb.Components.Navigation.Navbar.app_navbar
+  :if={!String.starts_with?(@active_path, "/auth/")}
+  current_user={@current_user}
+  active_path={@active_path}
+/>
+
+<.mobile_menu class="absolute w-9/12 h-full transition-all left-0 top-0 -translate-x-full dark:text-white bg-gray-50 dark:bg-gray-600 duration-200 overflow-auto">
+  <div class="w-auto" id="navbar-mobile">
+    <ul class="flex flex-col px-2 py-4 mt-4 space-y-2 dark:border-gray-700">
+      <%= if @current_user do %>
+        <.link
+          :for={
+            menu_item <- [
+              %{id: "home-icon-mobile", title: "Home", path: ~p"/"},
+              %{id: "new-post-mobile", title: "New post", path: ~p"/new/post"},
+              %{id: "contact-mobile", title: "Contact", path: ~p"/"}
+            ]
+          }
+          navigate={menu_item.path}
+          id={menu_item.id}
+        >
+          <li class="block py-2 px-4 rounded-full hover:bg-indigo-100 dark:hover:bg-slate-500 dark:hover:text-white">
+            <span><%= menu_item.title %></span>
+          </li>
+        </.link>
+      <% else %>
+        <.link navigate={~p"/auth/login"}>
+          <li class="block py-2 px-4 rounded-full hover:bg-indigo-100 dark:hover:bg-slate-500 dark:hover:text-white">
+            Log In
+          </li>
+        </.link>
+        <.link navigate={~p"/auth/signup"}>
+          <li class="block py-2 px-4 rounded-full hover:bg-indigo-100 dark:hover:bg-slate-500 dark:hover:text-white">
+            Sign Up
+          </li>
+        </.link>
+      <% end %>
+    </ul>
+  </div>
+</.mobile_menu>
+
+<main
+  role="main"
+  class={"relative w-full dark:bg-slate-700 dark:text-slate-100 flex flex-col #{if(!String.starts_with?(@active_path, "/auth/"), do: "min-h-screen pt-20", else: "pt-0")}"}
+>
+  <.flash_group flash={@flash} />
+
+  <%= @inner_content %>
+</main>

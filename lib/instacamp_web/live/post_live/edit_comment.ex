@@ -10,7 +10,7 @@ defmodule InstacampWeb.PostLive.EditComment do
       <h1 class="text-2xl font-semibold mb-4">Editing comment</h1>
 
       <.form
-        let={f}
+        :let={f}
         for={@comment_changeset}
         id="edit_comment-form"
         phx-submit="save_comment"
@@ -18,7 +18,7 @@ defmodule InstacampWeb.PostLive.EditComment do
         as={:comment}
       >
         <div class="flex flex-col">
-          <%= hidden_input(f, :body, id: :comment_body, phx_hook: "TrixEditorHook") %>
+          <%= hidden_input(f, :body, id: :comment_body, phx_hook: "CommentBodyHook") %>
 
           <div class="w-full">
             <div id="trix-editor" phx-update="ignore">

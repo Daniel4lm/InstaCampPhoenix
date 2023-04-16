@@ -3,6 +3,8 @@ defmodule InstacampWeb.SettingsLive.Components.FollowListComponent do
 
   use InstacampWeb, :live_component
 
+  alias Instacamp.FileHandler
+  alias InstacampWeb.CoreComponents
   alias InstacampWeb.SettingsLive.Components.FollowComponent
 
   @impl Phoenix.LiveComponent
@@ -19,23 +21,19 @@ defmodule InstacampWeb.SettingsLive.Components.FollowListComponent do
         <%= for follow <- @follow_list do %>
           <div class="p-4">
             <div class="flex items-center">
-              <%= live_redirect to: Routes.user_profile_path(@socket, :index, get_follow_user(follow, @action).username) do %>
-                <%= img_tag(get_follow_user(follow, @action).avatar_url,
-                  class:
-                    "w-8 h-8 md:w-10 md:h-10 p-[1px] border border-gray-300 rounded-full object-cover object-center"
-                ) %>
-              <% end %>
+              <CoreComponents.user_avatar
+                with_link={~p"/user/#{get_follow_user(follow, @action).username}"}
+                src={FileHandler.get_avatar_thumb(get_follow_user(follow, @action).avatar_url)}
+                class="w-8 h-8 md:w-10 md:h-10"
+              />
 
               <div class="ml-3">
-                <%= live_redirect(get_follow_user(follow, @action).username,
-                  to:
-                    Routes.user_profile_path(
-                      @socket,
-                      :index,
-                      get_follow_user(follow, @action).username
-                    ),
-                  class: "font-semibold text-sm truncate hover:underline"
-                ) %>
+                <.link
+                  navigate={~p"/user/#{get_follow_user(follow, @action).username}"}
+                  class="font-semibold text-sm truncate hover:underline"
+                >
+                  <%= get_follow_user(follow, @action).username %>
+                </.link>
                 <h6
                   id={"follow-name-#{get_follow_user(follow, @action).id}"}
                   class="font-semibold text-sm truncate text-gray-400 dark:text-slate-100"
@@ -46,7 +44,6 @@ defmodule InstacampWeb.SettingsLive.Components.FollowListComponent do
               <%= if @current_user && @current_user != get_follow_user(follow, @action) do %>
                 <span class="ml-auto">
                   <.live_component
-                    socket={@socket}
                     module={FollowComponent}
                     id={"#{get_follow_user(follow, @action).id}-list"}
                     user={get_follow_user(follow, @action)}

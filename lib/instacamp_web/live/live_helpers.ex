@@ -2,11 +2,7 @@ defmodule InstacampWeb.LiveHelpers do
   @moduledoc false
 
   use Phoenix.HTML
-
-  import Phoenix.LiveView
-  import Phoenix.LiveView.Helpers
-
-  alias Phoenix.LiveView.JS
+  use Phoenix.Component
 
   @type tag :: Phoenix.HTML.Tag
 
@@ -20,115 +16,63 @@ defmodule InstacampWeb.LiveHelpers do
     content_tag(:li, title, class: "m-1 p-4 #{selected_link?(current_uri_path, menu_link)}")
   end
 
+  attr :current_uri_path, :string, required: true
+  attr :menu_link, :string, required: true
+  attr :title, :string, required: true
+  slot :inner_block
+
   def sidebar_link_tag(
         %{title: title, current_uri_path: current_uri_path, menu_link: menu_link} = assigns
       ) do
+    assigns =
+      assigns
+      |> assign(:current_uri_path, current_uri_path)
+      |> assign(:menu_link, menu_link)
+      |> assign(:title, title)
+
     ~H"""
-    <%= content_tag :li, class: "flex items-center justify-between m-1 p-4 #{selected_link?(current_uri_path, menu_link)}" do %>
-      <span class="mr-2"><%= title %></span>
+    <%= content_tag :li, class: "flex items-center justify-between m-1 p-4 #{selected_link?(@current_uri_path, @menu_link)}" do %>
+      <span class="mr-2"><%= @title %></span>
       <%= render_slot(@inner_block) %>
     <% end %>
     """
   end
 
+  attr :active_path, :string, required: true
+  attr :class, :string, default: nil
+  attr :current_path, :string, required: true
+  attr :link_path, :string, required: true
+  slot :inner_block, required: true
+
+  @doc """
+  Generates navigation link.
+  """
   @spec nav_link(map()) :: Phoenix.LiveView.Rendered.t()
   def nav_link(
         %{active_path: active_path, current_path: current_path, link_path: link_path} = assigns
       ) do
+    assigns = assign(assigns, :link_path, link_path)
+
     if active_path == current_path do
       ~H"""
-      <%= live_patch to: link_path do %>
+      <.link patch={@link_path} class={@class}>
         <%= render_slot(@inner_block) %>
-      <% end %>
+      </.link>
       """
     else
       ~H"""
-      <%= live_redirect to: link_path do %>
+      <.link navigate={@link_path} class={@class}>
         <%= render_slot(@inner_block) %>
-      <% end %>
+      </.link>
       """
     end
   end
 
   defp selected_link?(current_uri, menu_link) when current_uri == menu_link do
-    "rounded-md bg-indigo-100 dark:bg-slate-400 text-gray-900 ease-in-out"
+    "max-h-14 rounded-md bg-indigo-100 dark:bg-slate-400 text-gray-900 ease-in-out"
   end
 
   defp selected_link?(_current_uri, _menu_link) do
-    "rounded-md hover:bg-gray-100 dark:hover:bg-slate-500 ease-in-out"
-  end
-
-  @spec display_website_uri(String.t()) :: String.t()
-  def display_website_uri(website) do
-    website =
-      website
-      |> String.replace_leading("https://", "")
-      |> String.replace_leading("http://", "")
-
-    website
-  end
-
-  @doc """
-  Renders a live component inside a modal.
-
-  The rendered modal receives a `:return_to` option to properly update
-  the URL when the modal is closed.
-
-  ## Examples
-
-      <.modal return_to={...}>
-        <.live_component
-          module={...}
-          id={@post.id || :new}
-          title={@page_title}
-          action={@live_action}
-          return_to={...}
-          post: @post
-        />
-      </.modal>
-  """
-  @spec modal(map()) :: Phoenix.LiveView.Rendered.t()
-  def modal(assigns) do
-    assigns = assign_new(assigns, :return_to, fn -> nil end)
-
-    ~H"""
-    <div
-      id="modal"
-      class="w-full h-full flex items-center justify-center left-0 top-0 z-50 !opacity-100 fixed bg-[#0000001a] overflow-auto fade-in"
-      phx-remove={hide_modal()}
-    >
-      <div
-        id="modal-content"
-        class={
-          if(assigns[:w_size], do: @w_size, else: "w-full") <>
-            " h-auto rounded-xl mx-auto my-1/2 bg-gray-50 border-2 border-gray-400 fade-in-scale overflow-auto"
-        }
-        phx-click-away={JS.dispatch("click", to: "#close")}
-        phx-window-keydown={JS.dispatch("click", to: "#close")}
-        phx-key="escape"
-      >
-        <%= if @return_to do %>
-          <%= live_patch("✖",
-            to: @return_to,
-            id: "close",
-            class: "float-right my-3 mr-3 dark:text-slate-200",
-            phx_click: hide_modal()
-          ) %>
-        <% else %>
-          <a id="close" href="#" class="phx-modal-close dark:!text-slate-200" phx-click={hide_modal()}>
-            ✖
-          </a>
-        <% end %>
-
-        <%= render_slot(@inner_block) %>
-      </div>
-    </div>
-    """
-  end
-
-  defp hide_modal(js \\ %JS{}) do
-    js
-    |> JS.hide(to: "#modal", transition: "fade-out")
-    |> JS.hide(to: "#modal-content", transition: "fade-out-scale")
+    "max-h-14 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500 ease-in-out"
   end
 end

@@ -10,8 +10,12 @@ defmodule InstacampWeb.Navigation.NavbarTest do
 
   describe "test navigation - no auth" do
     test "user can't see navigation bar", %{conn: conn} do
-      {:error, {:redirect, %{flash: %{}, to: "/auth/login"}}} =
-        live(conn, Routes.feed_path(conn, :index))
+      {:ok, home_live, html} = live(conn, Routes.feed_path(conn, :index))
+
+      assert html =~ "Campy"
+      assert html =~ "Log In"
+      assert html =~ "Sign Up"
+      refute has_element?(home_live, "#new-post")
     end
   end
 
@@ -28,10 +32,10 @@ defmodule InstacampWeb.Navigation.NavbarTest do
       }
     end
 
-    test "user see navigation bar", %{conn: conn} do
+    test "user can see and use navigation bar", %{conn: conn} do
       {:ok, home_live, html} = live(conn, Routes.feed_path(conn, :index))
 
-      assert html =~ "InstaCamp"
+      assert html =~ "Campy"
       refute html =~ "Log In"
 
       assert has_element?(home_live, "#search-posts-form")

@@ -67,6 +67,11 @@ defmodule InstacampWeb.FeatureCase do
     Browser.visit(session, "/")
   end
 
+  @spec visit_login_path(session()) :: session()
+  def visit_login_path(session) do
+    Browser.visit(session, "/auth/login")
+  end
+
   @spec open_post_page(session(), Posts.Post.t()) :: session()
   def open_post_page(session, %Posts.Post{} = post) do
     Browser.visit(session, "/post/" <> post.slug)

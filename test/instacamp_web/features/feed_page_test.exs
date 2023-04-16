@@ -78,7 +78,7 @@ defmodule InstacampWeb.Features.FeedPageTest do
 
     session =
       session
-      |> visit_root_path()
+      |> visit_login_path()
       |> log_in_user("john@mail.org", "Valid_password")
 
     %{sessions: session, user_1: user_1, user_2: user_2}
@@ -86,10 +86,11 @@ defmodule InstacampWeb.Features.FeedPageTest do
 
   feature "user visits root path, renders list of posts", %{
     session: session,
-    user_1: user_1,
-    user_2: user_2
+    user_1: _user_1,
+    user_2: _user_2
   } do
     session
+    |> assert_text("Welcome back!")
     |> assert_has(Query.css("#post-filter-container"))
     |> assert_has(Query.css("#posts-feed"))
     |> assert_has(Query.css("[id^='feed-item-']", count: 5))

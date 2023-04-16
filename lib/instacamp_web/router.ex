@@ -7,7 +7,7 @@ defmodule InstacampWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {InstacampWeb.LayoutView, :root}
+    plug :put_root_layout, {InstacampWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
@@ -16,6 +16,11 @@ defmodule InstacampWeb.Router do
   pipeline :api do
     plug :accepts, ["json"]
   end
+
+  # pipeline :admin do
+  #   plug :put_root_layout, html: {InstacampWeb.Layouts, :admin}
+  #   plug :admin_auth
+  # end
 
   # Other scopes may use custom stacks.
   # scope "/api", InstacampWeb do
@@ -28,10 +33,8 @@ defmodule InstacampWeb.Router do
     live_session :default,
       on_mount: [
         InstacampWeb.LiveHooks,
-        {InstacampWeb.LiveHooks, :assign_user},
         {InstacampWeb.LiveHooks, :assign_theme_mode}
-      ],
-      root_layout: {InstacampWeb.LayoutView, :root} do
+      ] do
       live "/", FeedLive, :index
       live "/user/:username", SettingsLive.UserProfile, :index, as: :user_profile
       live "/user/:username/saved", SettingsLive.UserProfile, :saved, as: :user_profile
@@ -60,7 +63,8 @@ defmodule InstacampWeb.Router do
   #
   # Note that preview only shows emails that were sent by the same
   # node running the Phoenix server.
-  if Enum.member?([:dev, :test], Application.compile_env(:instacamp, :env)) do
+
+  if Enum.member?([:dev, :test], Mix.env()) do
     scope "/dev" do
       pipe_through :browser
 
@@ -68,19 +72,18 @@ defmodule InstacampWeb.Router do
     end
   end
 
-  ## Authentication live routes
+  ## User settings live routes
   scope "/", InstacampWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :app_settings,
       on_mount: [
         InstacampWeb.LiveHooks,
-        {InstacampWeb.LiveHooks, :assign_user},
+        {InstacampWeb.LiveHooks, :ensure_authentication},
         {InstacampWeb.LiveHooks, :assign_theme_mode}
-      ],
-      root_layout: {InstacampWeb.LayoutView, :root} do
-      get "/auth/settings/confirm_email/:token", UserSettingsController, :confirm_email
-      live "/accounts/edit", SettingsLive.Settings
+      ] do
+      live "/auth/settings/confirm_email/:token", SettingsLive.Settings, :confirm_email
+      live "/accounts/edit", SettingsLive.Settings, :edit
       live "/accounts/password/change", SettingsLive.PassSettings
       live "/user/:username/following", SettingsLive.UserProfile, :following, as: :user_profile
       live "/user/:username/followers", SettingsLive.UserProfile, :followers, as: :user_profile
@@ -99,32 +102,33 @@ defmodule InstacampWeb.Router do
     live_session :app_auth,
       on_mount: [
         InstacampWeb.LiveHooks,
-        {InstacampWeb.LiveHooks, :assign_user},
+        {InstacampWeb.LiveHooks, :redirect_if_user_is_authenticated},
         {InstacampWeb.LiveHooks, :assign_theme_mode}
       ],
-      root_layout: {InstacampWeb.LayoutView, :root} do
-      live "/auth/signup", UserAuthLive.SignUp, :new
-      live "/auth/login", UserAuthLive.Login, :new
-      post "/auth/login", UserSessionController, :create
-      live "/reset-password", UserAuthLive.UserResetPassword, :new, as: :user_reset_password
+      root_layout: {InstacampWeb.Layouts, :auth} do
+      live "/auth/signup", UserAuthLive.UserSignUp, :new
+      live "/auth/login", UserAuthLive.UserLogin, :new
+      live "/auth/reset-password", UserAuthLive.UserResetPassword, :new
 
-      live "/reset-password/:token", UserAuthLive.UserResetPassword, :edit,
-        as: :user_reset_password
-
-      # get "/auth/reset_password", UserResetPasswordController, :new
-      # post "/auth/reset_password", UserResetPasswordController, :create
-      # get "/auth/reset_password/:token", UserResetPasswordController, :edit
-      # put "/auth/reset_password/:token", UserResetPasswordController, :update
+      live "/auth/reset-password/:token", UserAuthLive.UserResetPassword, :edit
     end
+
+    post "/auth/login", UserSessionController, :create
   end
 
   scope "/", InstacampWeb do
     pipe_through [:browser]
 
     delete "/auth/logout", UserSessionController, :delete
-    get "/auth/confirm", UserConfirmationController, :new
-    post "/auth/confirm", UserConfirmationController, :create
-    get "/auth/confirm/:token", UserConfirmationController, :edit
-    post "/auth/confirm/:token", UserConfirmationController, :update
+
+    live_session :current_user_confirm,
+      on_mount: [
+        InstacampWeb.LiveHooks,
+        {InstacampWeb.LiveHooks, :assign_user},
+        {InstacampWeb.LiveHooks, :assign_theme_mode}
+      ] do
+      live "/auth/confirm/:token", UserAuthLive.UserConfirmation, :edit
+      live "/auth/confirm", UserAuthLive.UserConfirmationInstructions, :new
+    end
   end
 end

@@ -14,7 +14,7 @@ defmodule InstacampWeb.FeedLive do
   def mount(_params, _session, socket) do
     case socket.assigns.current_user do
       nil ->
-        {:ok, redirect(socket, to: Routes.user_auth_login_path(socket, :new))}
+        nil
 
       user ->
         if connected?(socket) do
@@ -23,14 +23,16 @@ defmodule InstacampWeb.FeedLive do
             |> TopicHelper.user_notification_topic()
             |> Endpoint.subscribe()
         end
-
-        {:ok,
-         socket
-         |> assign(:page, 1)
-         |> assign(:per_page, 5)
-         |> assign(:post_feed_section_update, "append")
-         |> set_loader_status(false), temporary_assigns: [post_feed: nil]}
     end
+
+    {:ok,
+     socket
+     |> assign(:page, 1)
+     |> assign(:per_page, 5)
+     |> stream(:post_feed, [])
+     |> assign(:stream_ids, [])
+     |> set_loader_status(false)
+     |> set_loader_status(false)}
   end
 
   @impl Phoenix.LiveView
@@ -56,11 +58,21 @@ defmodule InstacampWeb.FeedLive do
       end)
       |> Map.new()
 
-    {:noreply, patch_page(socket, url_params)}
+    {:noreply,
+     socket
+     |> stream_batch_empty(:post_feed, socket.assigns.stream_ids)
+     |> patch_page(url_params)}
   end
 
-  def handle_event("reset_form", _params, socket) do
-    {:noreply, patch_page(socket)}
+  def handle_event("assign_stream_ids", %{"ids_list" => ids_list}, socket) do
+    {:noreply, assign(socket, :stream_ids, ids_list)}
+  end
+
+  def handle_event("clear_post_list", %{"ids_list" => ids_list}, socket) do
+    {:noreply,
+     socket
+     |> stream_batch_empty(:post_feed, ids_list)
+     |> patch_page()}
   end
 
   def handle_event("show_more_posts", %{"page" => new_page} = _params, socket) do
@@ -72,20 +84,12 @@ defmodule InstacampWeb.FeedLive do
       if new_page <= total_pages do
         socket
         |> assign(:page, new_page)
-        |> assign(:post_feed_section_update, "append")
         |> assign_post_feed()
       else
         set_loader_status(socket, false)
       end
 
     {:noreply, socket}
-  end
-
-  defp patch_page(socket, params \\ %{}) do
-    socket
-    |> assign(:page, 1)
-    |> assign(:post_feed_section_update, "replace")
-    |> push_patch(to: Routes.feed_path(socket, :index, params), replace: true)
   end
 
   defp assign_filter_post_changeset(socket, params_map) do
@@ -96,6 +100,12 @@ defmodule InstacampWeb.FeedLive do
     |> assign(:post_filter_changeset, Posts.change_filter_post(posts_filter))
   end
 
+  defp patch_page(socket, params \\ %{}) do
+    socket
+    |> assign(:page, 1)
+    |> push_patch(to: ~p"/?#{params}")
+  end
+
   defp assign_post_feed(socket) do
     cur_page = socket.assigns.page
     per_page = socket.assigns.per_page
@@ -104,7 +114,7 @@ defmodule InstacampWeb.FeedLive do
     total_pages = ceil(post_feed_count / per_page)
 
     socket
-    |> assign(:post_feed, Posts.get_post_feed(cur_page, per_page, post_filter))
+    |> stream_batch_insert(:post_feed, Posts.get_post_feed(cur_page, per_page, post_filter))
     |> assign(:post_feed_count, post_feed_count)
     |> set_loader_status(cur_page < total_pages)
   end

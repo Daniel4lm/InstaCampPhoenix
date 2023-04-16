@@ -6,14 +6,14 @@ defmodule InstacampWeb.Features.AuthTest do
     |> visit_root_path()
     |> assert_text("Sign Up")
     |> click(Query.link("Sign Up"))
-    |> assert_text("Sign up to see post and videos from your friends.")
+    |> assert_text("Sign up to see post and videos from your friends")
     |> fill_in(Query.css(~s([name="user[email]")), with: "john@mail.org")
     |> fill_in(Query.css(~s([name="user[full_name]")), with: "John Kiwi")
     |> fill_in(Query.css(~s([name="user[location]")), with: "San Francisco")
     |> fill_in(Query.css(~s([name="user[username]")), with: "john_4k")
     |> fill_in(Query.css(~s([name="user[password]")), with: "Valid_password")
     |> click(Query.button("Sign up"))
-    |> lazily_refute_has(Query.text("Sign up to see post and videos from your friends."))
+    |> lazily_refute_has(Query.text("Sign up to see post and videos from your friends"))
     |> wait(400)
     |> assert_text("Welcome John Kiwi. Your account is created successfully!")
 
@@ -25,7 +25,7 @@ defmodule InstacampWeb.Features.AuthTest do
     |> assert_text("Invalid email or password")
     |> log_in_user("john@mail.org", "Valid_password")
     |> wait(400)
-    |> assert_text("InstaCamp")
+    |> assert_text("Campy")
     |> assert_has(Query.css("[id='user-avatar']"))
     |> click(Query.css("[id='user-avatar']"))
     |> assert_has(Query.css("[id='settings-menu']"))
@@ -52,19 +52,52 @@ defmodule InstacampWeb.Features.AuthTest do
     |> fill_in(Query.css(~s([name="user[location]"])), with: "London")
     |> fill_in(Query.css(~s([name="user[bio]"])), with: "Something about me...")
     |> click(Query.css(~s([for="user-settings-form_settings_theme_mode_dark"])))
-    |> attach_file(photo_field, path: "test/support/blog_image.jpg")
+    |> attach_file(photo_field, path: "test/support/test_image.jpg")
     |> click(Query.button("Submit"))
 
     find(session, photo_field, fn e ->
       value = Wallaby.Element.value(e)
-      assert value =~ "blog_image.jpg"
+      assert value =~ "test_image.jpg"
     end)
 
     session
-    |> assert_has(Query.css(".alert-info"))
+    |> assert_has(Query.css("#flash"))
     |> assert_text("User updated successfully!")
+    |> click(Query.css("#flash"))
     |> click(Query.css("[id='user-avatar']"))
     |> assert_text("John Smith")
-    |> wait(1000)
+    |> click(Query.css("[id='user-avatar']"))
+
+    # |> attach_file(photo_field, path: "priv/static/images/phoenix.png")
+    # |> wait(1000)
+    # |> click(Query.button("Submit"))
+
+    # find(session, photo_field, fn e ->
+    #   value = Wallaby.Element.value(e)
+    #   assert value =~ "phoenix.png"
+    # end)
+
+    # session
+    # # |> wait(1000)
+    # |> assert_text("User updated successfully!")
+    # |> click(Query.css("#flash"))
+
+    avatars_path =
+      :instacamp
+      |> Application.app_dir("priv")
+      |> Path.join("uploads/avatars")
+
+    assert File.dir?(avatars_path)
+
+    {:ok, files} = File.ls(avatars_path)
+
+    Enum.map(files, fn file_name ->
+      if String.starts_with?(file_name, "test_image-") ||
+           String.starts_with?(file_name, "thumb_test_image-") do
+        avatars_path
+        |> Path.join(file_name)
+        |> File.rm!()
+      end
+    end)
   end
 end

@@ -15,6 +15,7 @@ defmodule InstacampWeb.UserAuthLive.UserProfileTest do
       assert html =~ user_2.full_name
       assert html =~ user_2.location
       refute html =~ "Edit Profile"
+      assert page_title(profile_live) =~ "Instacamp · Damir (@damir)"
       assert html =~ "Follow"
       assert has_element?(profile_live, "#follow-component")
 
@@ -39,6 +40,7 @@ defmodule InstacampWeb.UserAuthLive.UserProfileTest do
       assert html =~ user_1.username
       assert html =~ user_1.full_name
       assert html =~ "Edit Profile"
+      assert page_title(profile_live) =~ "Instacamp · Daniel (@daniel)"
       refute has_element?(profile_live, "#follow-component")
 
       assert html =~ "<span>Posts <b>1</b></span>"

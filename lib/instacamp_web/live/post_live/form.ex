@@ -16,7 +16,7 @@ defmodule InstacampWeb.PostLive.Form do
     {:ok,
      socket
      |> assign(:post_tags, [])
-     |> allow_upload(:photo_url,
+     |> allow_upload(:post_photo_url,
        accept: ~w(.jpg .jpeg .png),
        max_file_size: 30_000_000
      )}
@@ -51,7 +51,7 @@ defmodule InstacampWeb.PostLive.Form do
 
   @impl Phoenix.LiveView
   def handle_event("cancel_image_upload", %{"ref" => ref}, socket) do
-    {:noreply, cancel_upload(socket, :photo_url, ref)}
+    {:noreply, cancel_upload(socket, :post_photo_url, ref)}
   end
 
   def handle_event("add-item", item, socket) do
@@ -78,9 +78,9 @@ defmodule InstacampWeb.PostLive.Form do
     file_path =
       FileHandler.maybe_upload_image(
         socket,
-        "/uploads/blog",
-        "priv/static/uploads/blog",
-        :photo_url
+        "priv/uploads/blog",
+        :post_photo_url,
+        socket.assigns.blog_post.photo_url
       )
 
     params = if file_path, do: Map.put(post_params, "photo_url", file_path), else: post_params
@@ -100,10 +100,7 @@ defmodule InstacampWeb.PostLive.Form do
            ) do
       post_action_broadcast(live_action, post)
 
-      {:noreply,
-       push_redirect(socket,
-         to: Routes.user_profile_path(socket, :index, socket.assigns.current_user.username)
-       )}
+      {:noreply, push_navigate(socket, to: ~p"/user/#{socket.assigns.current_user.username}")}
     else
       false ->
         {:noreply, assign(socket, post_changeset: changeset)}

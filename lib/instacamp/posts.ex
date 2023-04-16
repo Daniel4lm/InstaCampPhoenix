@@ -414,7 +414,7 @@ defmodule Instacamp.Posts do
   end
 
   @doc """
-  Returns the list of post_comments.
+  Returns the list of post comments.
 
   ## Examples
 
@@ -699,7 +699,7 @@ defmodule Instacamp.Posts do
     like_transaction =
       Ecto.Multi.new()
       |> Ecto.Multi.delete(:like, like)
-      |> Ecto.Multi.delete(:notification, like_notification)
+      |> maybe_delete_like_notification(like_notification)
       |> Ecto.Multi.update_all(:update_total_likes, update_resource_with_total_likes,
         inc: [total_likes: -1]
       )
@@ -711,6 +711,16 @@ defmodule Instacamp.Posts do
 
       {:error, _failed_operation, changeset, _changes_so_far} ->
         {:error, changeset}
+    end
+  end
+
+  defp maybe_delete_like_notification(transaction, like_notification) do
+    case like_notification do
+      nil ->
+        transaction
+
+      like_notification ->
+        Ecto.Multi.delete(transaction, :notification, like_notification)
     end
   end
 

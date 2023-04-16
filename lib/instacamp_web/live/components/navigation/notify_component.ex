@@ -1,9 +1,11 @@
 defmodule InstacampWeb.Components.Navigation.NotifyComponent do
   @moduledoc false
 
-  use InstacampWeb, :component
+  use InstacampWeb, :html
 
+  alias Instacamp.FileHandler
   alias Instacamp.Repo
+  alias InstacampWeb.CoreComponents
 
   @type assigns :: map()
   @type output :: Phoenix.LiveView.Rendered.t()
@@ -18,13 +20,17 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
 
     ~H"""
     <li class="flex items-center p-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50">
-      <%= live_redirect to: Routes.user_profile_path(@socket, :index, @author.username), class: "w-[2rem]" do %>
-        <%= img_tag(@author.avatar_url,
-          class: "w-8 h-8 rounded-full object-center p-[1px] border border-gray-300"
-        ) %>
-      <% end %>
-      <%= live_redirect to: "/post/#{@notification.post.slug}#comment-#{@notification.comment.id}", class: "w-11/12 px-2" do %>
-        <div class="">
+      <CoreComponents.user_avatar
+        with_link={~p"/user/#{@author.username}"}
+        src={FileHandler.get_avatar_thumb(@author.avatar_url)}
+        class="w-8 h-8"
+      />
+
+      <.link
+        navigate={~p"/post/#{@notification.post.slug}/#comment-#{@notification.comment.id}"}
+        class="w-11/12 px-2"
+      >
+        <div>
           <div class="flex flex-wrap items-center">
             <span class="text-sm font-light">
               <span class="font-bold text-sm text-gray-500 dark:text-gray-200">
@@ -38,7 +44,7 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
             <%= Timex.from_now(@time) %>
           </span>
         </div>
-      <% end %>
+      </.link>
     </li>
     """
   end
@@ -52,13 +58,13 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
 
     ~H"""
     <li class="flex items-center p-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50">
-      <%= live_redirect to: Routes.user_profile_path(@socket, :index, @author.username), class: "w-[2rem]" do %>
-        <%= img_tag(@author.avatar_url,
-          class: "w-8 h-8 rounded-full object-center p-[1px] border border-gray-300"
-        ) %>
-      <% end %>
-      <%= live_redirect to: Routes.post_show_path(@socket, :show, @notification.post.slug), class: "w-11/12 px-2" do %>
-        <div class="">
+      <CoreComponents.user_avatar
+        with_link={~p"/user/#{@author.username}"}
+        src={FileHandler.get_avatar_thumb(@author.avatar_url)}
+        class="w-8 h-8"
+      />
+      <.link navigate={~p"/post/#{@notification.post.slug}"} class="w-11/12 px-2">
+        <div>
           <div class="flex flex-wrap items-center">
             <span class="text-sm font-light">
               <span class="font-bold text-sm text-gray-500 dark:text-gray-200">
@@ -72,7 +78,7 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
             <%= Timex.from_now(@time) %>
           </span>
         </div>
-      <% end %>
+      </.link>
     </li>
     """
   end
@@ -86,12 +92,15 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
 
     ~H"""
     <li class="flex items-center px-2 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50">
-      <%= live_redirect to: Routes.user_profile_path(@socket, :index, @author.username), class: "w-[2rem]" do %>
-        <%= img_tag(@author.avatar_url,
-          class: "w-8 h-8 rounded-full object-center p-[1px] border border-gray-300"
-        ) %>
-      <% end %>
-      <%= live_redirect to: Routes.post_show_path(@socket, :show, @notification.post.slug), class: "w-11/12 px-2" do %>
+      <CoreComponents.user_avatar
+        with_link={~p"/user/#{@author.username}"}
+        src={FileHandler.get_avatar_thumb(@author.avatar_url)}
+        class="w-8 h-8"
+      />
+      <.link
+        navigate={~p"/post/#{@notification.post.slug}/#comment-#{@notification.comment.id}"}
+        class="w-11/12 px-2"
+      >
         <div>
           <div class="flex flex-wrap items-center">
             <span class="text-sm font-light">
@@ -106,7 +115,7 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
             <%= Timex.from_now(@time) %>
           </span>
         </div>
-      <% end %>
+      </.link>
     </li>
     """
   end
@@ -119,11 +128,13 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
       |> assign(:time, assigns.notification.inserted_at)
 
     ~H"""
-    <%= live_redirect to: Routes.user_profile_path(@socket, :index, @author.username), class: "w-[2rem]" do %>
+    <.link navigate={~p"/user/#{@author.username}"} class="w-[2rem]">
       <li class="flex items-center px-2 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-400 dark:hover:bg-opacity-50">
-        <%= img_tag(@author.avatar_url,
-          class: "w-8 h-8 rounded-full object-center p-[1px] border border-gray-300"
-        ) %>
+        <CoreComponents.user_avatar
+          src={FileHandler.get_avatar_thumb(@author.avatar_url)}
+          class="w-8 h-8"
+        />
+
         <div class="px-2">
           <div class="flex flex-wrap items-center">
             <span class="text-sm font-light">
@@ -138,7 +149,7 @@ defmodule InstacampWeb.Components.Navigation.NotifyComponent do
           </span>
         </div>
       </li>
-    <% end %>
+    </.link>
     """
   end
 

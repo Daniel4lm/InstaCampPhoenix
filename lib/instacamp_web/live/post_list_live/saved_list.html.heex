@@ -9,12 +9,12 @@
 
       <%= if @live_action == :search do %>
         <.form
-          let={f}
-          for={:list_search}
+          :let={f}
+          for={%{}}
           id="search-saved-form"
           phx-submit="search_list"
           class="mx-4 my-6"
-          as={:search_term}
+          as={:list_search}
         >
           <div class="flex items-center">
             <div class="flex-1">

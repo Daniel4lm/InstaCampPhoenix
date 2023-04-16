@@ -1,10 +1,11 @@
 defmodule InstacampWeb.PostListLive.SavedListComponents do
   @moduledoc false
 
-  use InstacampWeb, :component
+  use InstacampWeb, :html
 
   alias Instacamp.DateTimeHelper
   alias Instacamp.Posts
+  alias InstacampWeb.CoreComponents
 
   @spec saved_list_component(map()) :: Phoenix.LiveView.Rendered.t()
   def saved_list_component(assigns) do
@@ -31,26 +32,25 @@ defmodule InstacampWeb.PostListLive.SavedListComponents do
     >
       <div class="flex">
         <div class="my-3">
-          <%= live_redirect to: Routes.user_profile_path(@socket, :index, @post.user.username) do %>
-            <%= img_tag(@post.user.avatar_url,
-              class:
-                "w-8 h-8 rounded-full object-cover object-center p-[1px] border border-gray-300 dark:border-slate-400"
-            ) %>
-          <% end %>
+          <CoreComponents.user_avatar
+            with_link={~p"/user/#{@post.user.username}"}
+            src={@post.user.avatar_url}
+            class="w-8 h-8"
+          />
         </div>
         <div class="flex flex-1 flex-col py-2 px-4 ">
-          <%= live_redirect to: Routes.post_show_path(@socket, :show, @post.slug) do %>
+          <.link navigate={~p"/post/#{@post.slug}"}>
             <h1 class="text-sm md:text-lg font-semibold hover:text-indigo-500 dark:hover:text-indigo-200">
               <%= @post.title %>
             </h1>
-          <% end %>
+          </.link>
 
           <div class="flex items-center flex-wrap">
-            <%= live_redirect to: Routes.user_profile_path(@socket, :index, @post.user.username) do %>
+            <.link navigate={~p"/user/#{@post.user.username}"}>
               <h1 class="text-sm md:text-base font-normal hover:text-indigo-500 dark:hover:text-indigo-200">
                 <%= @post.user.full_name %>
               </h1>
-            <% end %>
+            </.link>
 
             <time
               datetime={@post.updated_at}
@@ -68,11 +68,11 @@ defmodule InstacampWeb.PostListLive.SavedListComponents do
               <div class="flex flex-wrap gap-2 mt-2 md:mt-0 text-sm">
                 •
                 <%= for tag <- @post.tags do %>
-                  <%= live_redirect to: Routes.feed_path(@socket, :index, %{tag: tag.name}) do %>
+                  <.link navigate={~p"/?#{%{tag: tag.name}}"}>
                     <span class="border rounded-full px-3 py-[2px] border-gray-200 dark:border-slate-400 hover:bg-sky-100 hover:border-blue-300 dark:hover:bg-inherit dark:hover:border-slate-400 cursor-pointer">
                       #<%= tag.name %>
                     </span>
-                  <% end %>
+                  </.link>
                 <% end %>
               </div>
             <% end %>

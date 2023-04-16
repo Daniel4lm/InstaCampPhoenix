@@ -14,8 +14,8 @@ defmodule InstacampWeb.SettingsLive.PassSettings do
     current_user = socket.assigns.current_user
     password_changeset = Accounts.change_user_password(current_user)
 
-    pass_settings_path = Routes.live_path(socket, __MODULE__)
-    settings_path = Routes.live_path(socket, InstacampWeb.SettingsLive.Settings)
+    pass_settings_path = ~p"/accounts/password/change"
+    settings_path = ~p"/accounts/edit"
 
     {:ok,
      socket

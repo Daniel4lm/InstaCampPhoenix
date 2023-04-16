@@ -13,7 +13,10 @@ config :instacamp,
 # Configures the endpoint
 config :instacamp, InstacampWeb.Endpoint,
   url: [host: "localhost"],
-  render_errors: [view: InstacampWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [
+    formats: [html: InstacampWeb.ErrorHTML, json: InstacampWeb.ErrorJSON],
+    layout: false
+  ],
   pubsub_server: Instacamp.PubSub,
   live_view: [signing_salt: "1pVvNMyT"]
 
@@ -31,7 +34,7 @@ config :swoosh, :api_client, false
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.14.29",
+  version: "0.17.11",
   default: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),

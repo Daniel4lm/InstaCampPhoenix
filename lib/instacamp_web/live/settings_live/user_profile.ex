@@ -34,15 +34,18 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
         |> Endpoint.subscribe()
     end
 
-    {:ok,
-     socket
-     |> assign(:page, 1)
-     |> assign(:per_page, 5)
-     |> assign(:active_section, "posts")
-     |> assign(:comments_count, Enum.count(user.comments))
-     |> assign(:bookmarks_count, Posts.count_user_bookmarks(user))
-     |> set_loader_status(false)
-     |> assign(:user, user), temporary_assigns: [user_posts: []]}
+    {
+      :ok,
+      socket
+      |> assign(:page, 1)
+      |> assign(:per_page, 5)
+      |> assign(:active_section, "posts")
+      |> assign(:comments_count, Enum.count(user.comments))
+      |> assign(:bookmarks_count, Posts.count_user_bookmarks(user))
+      |> stream(:user_posts, [])
+      |> assign(:user, user)
+      |> set_loader_status(false)
+    }
   end
 
   @impl Phoenix.LiveView
@@ -57,7 +60,7 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
     user = socket.assigns.user
 
     if is_nil(user) do
-      redirect(socket, to: Routes.user_auth_login_path(socket, :new))
+      redirect(socket, to: ~p"/auth/login")
     else
       socket
       |> assign(:page_title, "#{user.full_name} (@#{user.username})")
@@ -100,12 +103,10 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
 
     case profile_user.id == updated_user.id do
       true ->
-        {:noreply,
-         push_redirect(socket, to: Routes.user_profile_path(socket, :index, updated_user.username))}
+        {:noreply, push_navigate(socket, to: ~p"/user/#{updated_user.username}")}
 
       false ->
-        {:noreply,
-         push_redirect(socket, to: Routes.user_profile_path(socket, :index, profile_user.username))}
+        {:noreply, push_navigate(socket, to: ~p"/user/#{profile_user.username}")}
     end
   end
 
@@ -118,19 +119,19 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
         socket
       )
       when event_name in ["new_post", "post_update"] do
-    {:noreply, update_post_list(socket, post.id)}
+    {:noreply, update_post_list(socket, post)}
   end
 
   def handle_info(
         %Broadcast{
           event: event_name,
-          payload: %{post_id: post_id},
+          payload: %{post: post},
           topic: "user_posts:" <> _user_id
         } = _message,
         socket
       )
       when event_name in ["like_post", "update_post_comment"] do
-    {:noreply, update_post_list(socket, post_id)}
+    {:noreply, update_post_list(socket, post)}
   end
 
   def handle_info(
@@ -144,8 +145,18 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
     {:noreply, update(socket, :user, fn _user -> updated_user end)}
   end
 
-  defp update_post_list(socket, post_id) do
-    update(socket, :user_posts, fn posts -> [Posts.get_post!(post_id) | posts] end)
+  @spec display_website_uri(String.t()) :: String.t()
+  def display_website_uri(website) do
+    website =
+      website
+      |> String.replace_leading("https://", "")
+      |> String.replace_leading("http://", "")
+
+    website
+  end
+
+  defp update_post_list(socket, post) do
+    stream_insert(socket, :user_posts, post, at: -1)
   end
 
   defp assign_posts(socket) do
@@ -158,7 +169,7 @@ defmodule InstacampWeb.SettingsLive.UserProfile do
     user_posts = Posts.list_user_profile_posts(user, cur_page, per_page)
 
     socket
-    |> assign(:user_posts, user_posts)
+    |> stream_batch_insert(:user_posts, user_posts)
     |> set_loader_status(cur_page < total_pages)
   end
 

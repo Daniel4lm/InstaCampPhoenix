@@ -1,7 +1,7 @@
 defmodule InstacampWeb.SettingsLive.Components.SettingsSidebarComponent do
   @moduledoc false
 
-  use InstacampWeb, :component
+  use InstacampWeb, :html
 
   alias InstacampWeb.Components.Icons
 
@@ -9,8 +9,8 @@ defmodule InstacampWeb.SettingsLive.Components.SettingsSidebarComponent do
   def settings_sidebar(assigns) do
     ~H"""
     <div class={@class}>
-      <ul class="flex flex-row justify-center md:flex-col ">
-        <%= live_redirect to: @settings_path, replace: false do %>
+      <ul class="flex flex-row items-center justify-center md:flex-col">
+        <.link navigate={@settings_path} class="w-1/2 md:w-full">
           <.sidebar_link_tag
             title="Edit Profile"
             current_uri_path={@current_uri_path}
@@ -18,9 +18,9 @@ defmodule InstacampWeb.SettingsLive.Components.SettingsSidebarComponent do
           >
             <Icons.settings_icon />
           </.sidebar_link_tag>
-        <% end %>
+        </.link>
 
-        <%= live_redirect to: @pass_settings_path, replace: false do %>
+        <.link navigate={@pass_settings_path} class="w-1/2 md:w-full">
           <.sidebar_link_tag
             title="Change Password"
             current_uri_path={@current_uri_path}
@@ -28,7 +28,7 @@ defmodule InstacampWeb.SettingsLive.Components.SettingsSidebarComponent do
           >
             <Icons.confirm_icon />
           </.sidebar_link_tag>
-        <% end %>
+        </.link>
       </ul>
     </div>
     """

@@ -17,37 +17,37 @@ defmodule InstacampWeb do
   and import those modules here.
   """
 
+  def static_paths, do: ~w(assets fonts images uploads favicon.ico robots.txt)
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: InstacampWeb
 
       import Plug.Conn
       import InstacampWeb.Gettext
-      alias InstacampWeb.Router.Helpers, as: Routes
-    end
-  end
 
-  def view do
-    quote do
-      use Phoenix.View,
-        root: "lib/instacamp_web/templates",
-        namespace: InstacampWeb
-
-      # Import convenience functions from controllers
-      import Phoenix.Controller,
-        only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
-
-      # Include shared imports and aliases for views
-      unquote(view_helpers())
+      unquote(verified_routes())
     end
   end
 
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {InstacampWeb.LayoutView, "live.html"}
+        layout: {InstacampWeb.Layouts, :app}
 
-      unquote(view_helpers())
+      def stream_batch_insert(socket, stream_key, items, opts \\ [{:at, -1}]) do
+        Enum.reduce(items, socket, fn item, socket ->
+          stream_insert(socket, stream_key, item, opts)
+        end)
+      end
+
+      def stream_batch_empty(socket, stream_key, stream_ids) do
+        Enum.reduce(stream_ids, socket, fn dom_id, socket ->
+          stream_delete_by_dom_id(socket, stream_key, dom_id)
+        end)
+      end
+
+      unquote(html_helpers())
     end
   end
 
@@ -55,7 +55,7 @@ defmodule InstacampWeb do
     quote do
       use Phoenix.LiveComponent
 
-      unquote(view_helpers())
+      unquote(html_helpers())
     end
   end
 
@@ -63,7 +63,7 @@ defmodule InstacampWeb do
     quote do
       use Phoenix.Component
 
-      unquote(view_helpers())
+      unquote(html_helpers())
     end
   end
 
@@ -84,22 +84,44 @@ defmodule InstacampWeb do
     end
   end
 
-  defp view_helpers do
+  def html do
+    quote do
+      use Phoenix.Component
+
+      # Import convenience functions from controllers
+      import Phoenix.Controller,
+        only: [get_csrf_token: 0, view_module: 1, view_template: 1]
+
+      # Include general helpers for rendering HTML
+      unquote(html_helpers())
+    end
+  end
+
+  defp html_helpers do
     quote do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
       # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
-      import Phoenix.LiveView.Helpers
+      import InstacampWeb.CoreComponents
       import InstacampWeb.LiveHelpers
-
-      # Import basic rendering functionality (render, render_layout, etc)
-      import Phoenix.View
 
       import InstacampWeb.ErrorHelpers
       import InstacampWeb.Gettext
+      import Phoenix.Component
 
-      alias InstacampWeb.Router.Helpers, as: Routes
+      alias Phoenix.LiveView.JS
+
+      unquote(verified_routes())
+    end
+  end
+
+  def verified_routes do
+    quote do
+      use Phoenix.VerifiedRoutes,
+        endpoint: InstacampWeb.Endpoint,
+        router: InstacampWeb.Router,
+        statics: InstacampWeb.static_paths()
     end
   end
 

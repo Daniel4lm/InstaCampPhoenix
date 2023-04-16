@@ -100,14 +100,14 @@ defmodule InstacampWeb.PostLive.FormTest do
     test "user can upload post image", %{conn: conn, user: user} do
       {:ok, form_live, _html} = live(conn, Routes.post_form_path(conn, :new))
 
-      upload = blog_image_upload(form_live, "blog_image.jpg")
+      upload = test_image_upload(form_live, "test_image.jpg")
 
-      render_upload(upload, "blog_image.jpg")
+      render_upload(upload, "test_image.jpg")
 
       {:ok, _live, html} =
         form_live
         |> form("#post-new-form",
-          photo_url: upload,
+          post_photo_url: upload,
           post: %{title: "Second post"}
         )
         |> render_submit(%{
@@ -127,7 +127,7 @@ defmodule InstacampWeb.PostLive.FormTest do
 
       file =
         :instacamp
-        |> Application.app_dir("priv/static")
+        |> Application.app_dir("priv")
         |> Path.join(post.photo_url)
 
       assert File.exists?(file)
@@ -139,8 +139,8 @@ defmodule InstacampWeb.PostLive.FormTest do
       {:ok, form_live, _html} = live(conn, Routes.post_form_path(conn, :new))
 
       form_live
-      |> blog_image_upload("blog_image.jpg")
-      |> render_upload("blog_image.jpg")
+      |> test_image_upload("test_image.jpg")
+      |> render_upload("test_image.jpg")
 
       assert form_live
              |> element("[name='cancel-image-upload']")
@@ -150,8 +150,8 @@ defmodule InstacampWeb.PostLive.FormTest do
     end
   end
 
-  defp blog_image_upload(view, filename) do
-    file_input(view, "#post-new-form", :photo_url, [
+  defp test_image_upload(view, filename) do
+    file_input(view, "#post-new-form", :post_photo_url, [
       %{
         name: filename,
         content: File.read!("test/support/#{filename}"),

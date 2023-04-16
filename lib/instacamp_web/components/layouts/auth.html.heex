@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" style="scrollbar-gutter: stable;">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content={csrf_token_value()} />
+    <.live_title prefix="Instacamp · "><%= assigns[:page_title] %></.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+  <body class="scroll-smooth bg-main-background antialiased">
+    <section class="w-full bg-indigo-900 h-48 py-8 px-10 ">
+      <div class="w-full flex justify-center text-white">
+        <.link navigate={~p"/"} class="flex items-center gap-3 mx-4">
+          <img src={~p"/images/campy.svg"} class="h-5 w-5 md:w-6 md:h-6" />
+          <h4 class="text-2xl md:text-3xl font-normal">Campy</h4>
+        </.link>
+      </div>
+    </section>
+    <%= @inner_content %>
+  </body>
+</html>
