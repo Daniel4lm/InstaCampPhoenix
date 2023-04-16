@@ -259,10 +259,8 @@ defmodule InstacampWeb.CoreComponents do
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
-      phx-click={
-        JS.push("lv:clear-flash", value: %{key: @kind})
-        |> JS.hide(to: "##{@id}", transition: "fade-out-scale")
-      }
+      phx-click={hide_flash(@kind, @id)}
+      phx-click-away={hide_flash(@kind, @id)}
       role="alert"
       class={[
         "fixed top-14 left-1/2 -translate-x-1/2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
@@ -284,6 +282,12 @@ defmodule InstacampWeb.CoreComponents do
       </button>
     </div>
     """
+  end
+
+  defp hide_flash(js \\ %JS{}, kind, id) do
+    js
+    |> JS.push("lv:clear-flash", value: %{key: kind})
+    |> JS.hide(to: "##{id}", transition: "fade-out-scale")
   end
 
   @doc """
