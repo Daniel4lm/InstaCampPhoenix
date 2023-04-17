@@ -34,12 +34,6 @@ defmodule Instacamp.FileHandler do
     end
   end
 
-  defp create_image(upload_directory_path, meta, image_filename, resource)
-       when resource in @upload_resources do
-    dest_path = file_cp(upload_directory_path, meta, image_filename)
-    dest_path
-  end
-
   defp create_image(upload_directory_path, meta, image_filename, :avatar_url) do
     dest_path = file_cp(upload_directory_path, meta, image_filename)
     dest_thumb_path = file_cp(upload_directory_path, meta, "thumb_#{image_filename}")
@@ -47,6 +41,12 @@ defmodule Instacamp.FileHandler do
     {:ok, _dst_path} = mogrify_thumbnail(meta.path, dest_path, 300)
     {:ok, _dst_path} = mogrify_thumbnail(meta.path, dest_thumb_path, 150)
 
+    dest_path
+  end
+
+  defp create_image(upload_directory_path, meta, image_filename, resource)
+       when resource in @upload_resources do
+    dest_path = file_cp(upload_directory_path, meta, image_filename)
     dest_path
   end
 
