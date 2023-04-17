@@ -82,6 +82,7 @@ defmodule Instacamp.Accounts.User do
       :website
     ])
     |> validate_user_name_and_full_name()
+    |> validate_website()
     |> validate_email(opts)
     |> validate_password(opts)
   end
@@ -101,6 +102,18 @@ defmodule Instacamp.Accounts.User do
       max: 30,
       message: "Full name should be at least 4 character(s)"
     )
+  end
+
+  defp validate_website(changeset) do
+    validate_change(changeset, :website, fn :website, website ->
+      uri = URI.parse(website)
+
+      if uri.scheme do
+        check_uri_scheme(uri.scheme)
+      else
+        [website: "Enter a valid website"]
+      end
+    end)
   end
 
   defp validate_email(changeset, opts \\ []) do
@@ -230,4 +243,8 @@ defmodule Instacamp.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  defp check_uri_scheme(scheme) when scheme == "http", do: []
+  defp check_uri_scheme(scheme) when scheme == "https", do: []
+  defp check_uri_scheme(_scheme), do: [website: "Enter a valid website"]
 end

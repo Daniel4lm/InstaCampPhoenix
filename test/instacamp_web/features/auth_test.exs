@@ -50,6 +50,9 @@ defmodule InstacampWeb.Features.AuthTest do
     |> assert_text("Full name should be at least 4 character(s)")
     |> fill_in(Query.css(~s([name="user[full_name]"])), with: "John Smith")
     |> fill_in(Query.css(~s([name="user[location]"])), with: "London")
+    |> fill_in(Query.css(~s([name="user[website]"])), with: "www.google.com")
+    |> assert_text("Enter a valid website")
+    |> fill_in(Query.css(~s([name="user[website]"])), with: "https://www.john-smith.com")
     |> fill_in(Query.css(~s([name="user[bio]"])), with: "Something about me...")
     |> click(Query.css(~s([for="user-settings-form_settings_theme_mode_dark"])))
     |> attach_file(photo_field, path: "test/support/test_image.jpg")
@@ -78,7 +81,6 @@ defmodule InstacampWeb.Features.AuthTest do
     # end)
 
     # session
-    # # |> wait(1000)
     # |> assert_text("User updated successfully!")
     # |> click(Query.css("#flash"))
 

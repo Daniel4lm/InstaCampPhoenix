@@ -124,6 +124,20 @@ defmodule Instacamp.AccountsTest do
       assert "has already been taken" in errors_on(changeset).username
     end
 
+    test "validates website when given" do
+      {:error, changeset} =
+        Accounts.register_user(%{
+          email: "antonio@gmail.com",
+          username: "antonio_m",
+          full_name: "Marco Antonio",
+          location: "San Marino",
+          password: "Hulala4444",
+          website: "www.google.com"
+        })
+
+      assert %{website: ["Enter a valid website"]} = errors_on(changeset)
+    end
+
     test "registers users with a hashed password" do
       email = unique_user_email()
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
