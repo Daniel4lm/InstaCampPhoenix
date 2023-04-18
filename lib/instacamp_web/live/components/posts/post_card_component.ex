@@ -21,7 +21,7 @@ defmodule InstacampWeb.Components.Posts.PostCardComponent do
     ~H"""
     <article
       id={"feed-item-#{@post.id}"}
-      class="relative group p-2 rounded-lg bg-white dark:bg-slate-600 border dark:border-transparent border-gray-200 hover:border-transparent hover:ring-2 hover:ring-indigo-300 dark:hover:ring-slate-400 duration-200 ease-in-out"
+      class="relative group p-2 rounded-lg bg-white dark:bg-slate-600 border dark:border-transparent border-gray-250 hover:border-transparent hover:ring-2 hover:ring-indigo-300 hover:dark:ring-slate-400 md:hover:ring-0 md:shadow-card-shadow md:hover:shadow-card-shadow-hover dark:shadow-none hover:dark:shadow-none duration-200 ease-in-out"
     >
       <.link navigate={~p"/post/#{@post.slug}"} class="absolute opacity-0 left-0 w-full h-full">
         "Link to post"
