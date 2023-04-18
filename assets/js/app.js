@@ -24,20 +24,24 @@ import "phoenix_html"
 import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import ScrollHooks from "./hooks/user_profile_posts_scroll"
 import CommentTextBody from "./hooks/comment_input"
 import CopyUrlHook from "./hooks/post/copy_url"
-import TrixEditorHooks from "./hooks/trix_editor"
-import ImageUploadDragDropHook from "./hooks/drag_drop_hook"
 import CreatePostTag from "./hooks/post/post_tags"
+import ImageUploadDragDropHook from "./hooks/drag_drop_hook"
+import FormInputHooks from "./hooks/form_input_hooks"
+import ScrollHooks from "./hooks/scroll_hooks"
+import ResetFeedHook from "./hooks/reset_feed_hook"
 import ThemeHooks from "./hooks/dark_mode"
 import ToolTip from "./hooks/tooltip"
+import TrixEditorHooks from "./hooks/trix_editor"
 
 let Hooks = {
     CommentTextBody,
     CopyUrlHook,
     CreatePostTag,
+    ...FormInputHooks,
     ImageUploadDragDropHook,
+    ResetFeedHook,
     ...ScrollHooks,
     ...ThemeHooks,
     ToolTip,
@@ -52,7 +56,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
-window.addEventListener("phx:page-loading-start", info => topbar.show())
+window.addEventListener("phx:page-loading-start", info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 
 // connect if there are any LiveViews on the page

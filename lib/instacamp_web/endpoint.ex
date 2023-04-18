@@ -25,7 +25,13 @@ defmodule InstacampWeb.Endpoint do
     at: "/",
     from: :instacamp,
     gzip: false,
-    only: ~w(assets fonts images uploads favicon.ico robots.txt)
+    only: InstacampWeb.static_paths()
+
+  plug Plug.Static,
+    at: "/uploads",
+    # from: {:instacamp, "priv/uploads"},
+    from: Path.expand("priv/uploads"),
+    gzip: false
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

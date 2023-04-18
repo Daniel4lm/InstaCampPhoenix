@@ -1,6 +1,6 @@
 defmodule Instacamp.Posts.Comment do
   @moduledoc """
-  Post Cooment Ecto schema
+  Post Comment Ecto schema
   """
 
   use Ecto.Schema

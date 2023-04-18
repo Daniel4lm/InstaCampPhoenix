@@ -9,14 +9,14 @@ defmodule InstacampWeb.PostLive.Form do
   alias InstacampWeb.Components.Icons
   alias InstacampWeb.Endpoint
   alias InstacampWeb.PostLive.MultitagsSelectComponent
-  alias InstacampWeb.PostTopicHelper
+  alias InstacampWeb.TopicHelper
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     {:ok,
      socket
      |> assign(:post_tags, [])
-     |> allow_upload(:photo_url,
+     |> allow_upload(:post_photo_url,
        accept: ~w(.jpg .jpeg .png),
        max_file_size: 30_000_000
      )}
@@ -51,12 +51,16 @@ defmodule InstacampWeb.PostLive.Form do
 
   @impl Phoenix.LiveView
   def handle_event("cancel_image_upload", %{"ref" => ref}, socket) do
-    {:noreply, cancel_upload(socket, :photo_url, ref)}
+    {:noreply, cancel_upload(socket, :post_photo_url, ref)}
   end
 
   def handle_event("add-item", item, socket) do
     new_tags = Enum.uniq([item | socket.assigns.post_tags])
-    {:noreply, assign(socket, :post_tags, new_tags)}
+
+    {:noreply,
+     socket
+     |> assign(:post_tags, new_tags)
+     |> clear_tag_from_changeset()}
   end
 
   def handle_event("validate_post", %{"post" => post_params}, socket) do
@@ -74,9 +78,9 @@ defmodule InstacampWeb.PostLive.Form do
     file_path =
       FileHandler.maybe_upload_image(
         socket,
-        "/uploads/blog",
-        "priv/static/uploads/blog",
-        :photo_url
+        "priv/uploads/blog",
+        :post_photo_url,
+        socket.assigns.blog_post.photo_url
       )
 
     params = if file_path, do: Map.put(post_params, "photo_url", file_path), else: post_params
@@ -96,10 +100,7 @@ defmodule InstacampWeb.PostLive.Form do
            ) do
       post_action_broadcast(live_action, post)
 
-      {:noreply,
-       push_redirect(socket,
-         to: Routes.user_profile_path(socket, :index, socket.assigns.current_user.username)
-       )}
+      {:noreply, push_navigate(socket, to: ~p"/user/#{socket.assigns.current_user.username}")}
     else
       false ->
         {:noreply, assign(socket, post_changeset: changeset)}
@@ -116,6 +117,18 @@ defmodule InstacampWeb.PostLive.Form do
     {:noreply, assign(socket, :post_tags, items)}
   end
 
+  defp clear_tag_from_changeset(socket) do
+    changeset_from_socket = socket.assigns.post_changeset
+    changes_from_changeset = Enum.into(changeset_from_socket.changes, %{tag: ""})
+
+    post_changeset =
+      %Post{}
+      |> Posts.change_post(changes_from_changeset)
+      |> Map.put(:action, :validate)
+
+    assign(socket, :post_changeset, post_changeset)
+  end
+
   defp parse_tags(tags_list) do
     tags_list
     |> Enum.map(&String.trim/1)
@@ -125,17 +138,17 @@ defmodule InstacampWeb.PostLive.Form do
 
   defp post_action_broadcast(:new, post) do
     post.user_id
-    |> PostTopicHelper.user_posts_topic()
+    |> TopicHelper.user_posts_topic()
     |> Endpoint.broadcast("new_post", %{post: post})
   end
 
   defp post_action_broadcast(:edit, post) do
     post.id
-    |> PostTopicHelper.post_topic()
+    |> TopicHelper.post_topic()
     |> Endpoint.broadcast("post_update", %{post: post})
 
     post.user_id
-    |> PostTopicHelper.user_posts_topic()
+    |> TopicHelper.user_posts_topic()
     |> Endpoint.broadcast("post_update", %{post: post})
   end
 end

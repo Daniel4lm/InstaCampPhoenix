@@ -9,6 +9,7 @@ defmodule Instacamp.Posts do
   alias Instacamp.Notifications
   alias Instacamp.Posts.Bookmark
   alias Instacamp.Posts.Comment
+  alias Instacamp.Posts.FilterPost
   alias Instacamp.Posts.Like
   alias Instacamp.Posts.Post
   alias Instacamp.Posts.PostTags
@@ -50,30 +51,14 @@ defmodule Instacamp.Posts do
   end
 
   @doc """
-  Returns the list of posts searched by specific tag/topic.
+  Returns the list of saved posts by specific user.
 
   ## Examples
 
-      iex> search_posts_by_tag("elixir")
+      iex> list_user_saved_posts(user, 1, 5)
       [%Post{}, ...]
 
   """
-  def search_posts_by_tag(tag_name) do
-    Repo.all(
-      from(p in Post,
-        join: pt in PostTags,
-        on: p.id == pt.post_id,
-        join: t in Tag,
-        on: t.id == pt.tag_id,
-        where: t.name == ^tag_name,
-        distinct: p.id,
-        select: p,
-        order_by: [desc: p.inserted_at],
-        preload: [:user, :tags]
-      )
-    )
-  end
-
   def list_user_saved_posts(user, page, per_page) do
     Repo.all(
       from(p in Post,
@@ -89,6 +74,20 @@ defmodule Instacamp.Posts do
         preload: [:user, :tags]
       )
     )
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking filter_post changes.
+
+  ## Examples
+
+      iex> change_filter_post(filter_post)
+      %Ecto.Changeset{data: %FilterPost{}}
+
+  """
+  @spec change_filter_post(FilterPost.t(), map()) :: Ecto.Changeset.t()
+  def change_filter_post(%FilterPost{} = filter, attrs \\ %{}) do
+    FilterPost.changeset(filter, attrs)
   end
 
   @doc """
@@ -111,20 +110,120 @@ defmodule Instacamp.Posts do
     |> Repo.all()
   end
 
-  def get_post_feed do
-    comments_portions =
-      from(c in Comment,
-        select: %{id: c.id, body: c.body, row_number: over(row_number(), :posts_partition)},
-        windows: [posts_partition: [partition_by: :post_id, order_by: [desc: :id]]]
-      )
+  @doc """
+  Gets the total number of filtered posts.
 
-    main_comments_query =
-      from(c in Comment,
-        join: r in subquery(comments_portions),
-        on: c.id == r.id
-      )
+  ## Examples
 
-    Repo.all(main_comments_query)
+      iex> count_post_feed(filter_attrs)
+      4
+
+  """
+  def count_post_feed(filter_attrs) do
+    p_subquery = post_feed_main_query(Post, filter_attrs)
+
+    Post
+    |> join(:inner, [p], r in subquery(p_subquery), on: p.id == r.id)
+    |> select([p], count(p.id))
+    |> Repo.one()
+  end
+
+  @doc """
+  Returns the list of filtered posts.
+
+  ## Examples
+
+      iex> get_post_feed(1, 5, filter_attrs)
+      [%Post{}, ...]
+
+  """
+  def get_post_feed(page, per_page, filter_attrs) do
+    Post
+    |> post_feed_main_query(filter_attrs)
+    |> offset(^((page - 1) * per_page))
+    |> limit(^per_page)
+    |> order_by([p], desc: p.inserted_at)
+    |> preload([p], [:user, :comment, :tags])
+    |> preload([p], comment: :user)
+    |> Repo.all()
+  end
+
+  defp post_feed_main_query(main_query, filter_attrs) do
+    main_query
+    |> with_user()
+    |> only_with_comments(filter_attrs.with_comments)
+    |> for_tag_name(filter_attrs.tag)
+    |> for_author(filter_attrs.author)
+    |> for_post(filter_attrs.title)
+    |> group_by([p], p.id)
+  end
+
+  defp with_user(query) do
+    join(query, :inner, [p], a in User, as: :author, on: p.user_id == a.id)
+  end
+
+  defp only_with_comments(query, false), do: query
+
+  defp only_with_comments(query, true) do
+    join(query, :inner, [p], c in Comment, as: :comment, on: p.id == c.post_id)
+  end
+
+  defp for_author(query, nil), do: query
+
+  defp for_author(query, author_name) do
+    expression = "%#{author_name}%"
+
+    where(
+      query,
+      [p, author: author],
+      ilike(author.username, ^expression) or ilike(author.full_name, ^expression)
+    )
+  end
+
+  defp for_post(query, nil), do: query
+
+  defp for_post(query, post_title) do
+    expression = "%#{post_title}%"
+
+    where(query, [p], ilike(p.title, ^expression))
+  end
+
+  defp for_tag_name(query, nil), do: query
+
+  defp for_tag_name(query, tag_name) do
+    query
+    |> with_tags()
+    |> join(:inner, [p, post_tag: pt], t in Tag, as: :tag, on: t.id == pt.tag_id)
+    |> where([p, tag: tag], tag.name == ^tag_name)
+  end
+
+  defp with_tags(query) do
+    join(query, :inner, [p], pt in PostTags, as: :post_tag, on: pt.post_id == p.id)
+  end
+
+  @doc """
+  Returns the list of posts searched by specific tag/topic.
+
+  ## Examples
+
+      iex> search_posts_by_tag("elixir")
+      [%Post{}, ...]
+
+  """
+  def search_posts_by_tag(tag_name) do
+    Repo.all(
+      from(p in Post,
+        join: pt in PostTags,
+        on: p.id == pt.post_id,
+        join: t in Tag,
+        on: t.id == pt.tag_id,
+        where: t.name == ^tag_name,
+        distinct: p.id,
+        select: p,
+        order_by: [desc: p.inserted_at],
+        preload: [:user, :tags]
+      )
+    )
   end
 
   @doc """
@@ -315,7 +414,7 @@ defmodule Instacamp.Posts do
   end
 
   @doc """
-  Returns the list of post_comments.
+  Returns the list of post comments.
 
   ## Examples
 
@@ -497,6 +596,21 @@ defmodule Instacamp.Posts do
   end
 
   @doc """
+  Returns the list of all users related to comments.
+
+  ## Examples
+
+      iex> get_users_from_comments([comment1, comment2, ...])
+      [%User{}, %User{}, ...]
+
+  """
+  def get_users_from_comments(post_comments) do
+    post_comments
+    |> Stream.uniq_by(fn %{user: %{id: id}} = _comment -> id end)
+    |> Enum.to_list()
+  end
+
+  @doc """
   Creates a like for Post or post comment.
 
   ## Examples
@@ -585,7 +699,7 @@ defmodule Instacamp.Posts do
     like_transaction =
       Ecto.Multi.new()
       |> Ecto.Multi.delete(:like, like)
-      |> Ecto.Multi.delete(:notification, like_notification)
+      |> maybe_delete_like_notification(like_notification)
       |> Ecto.Multi.update_all(:update_total_likes, update_resource_with_total_likes,
         inc: [total_likes: -1]
       )
@@ -597,6 +711,16 @@ defmodule Instacamp.Posts do
 
       {:error, _failed_operation, changeset, _changes_so_far} ->
         {:error, changeset}
+    end
+  end
+
+  defp maybe_delete_like_notification(transaction, like_notification) do
+    case like_notification do
+      nil ->
+        transaction
+
+      like_notification ->
+        Ecto.Multi.delete(transaction, :notification, like_notification)
     end
   end
 

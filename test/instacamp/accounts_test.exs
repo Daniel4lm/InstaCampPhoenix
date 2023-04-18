@@ -124,6 +124,20 @@ defmodule Instacamp.AccountsTest do
       assert "has already been taken" in errors_on(changeset).username
     end
 
+    test "validates website when given" do
+      {:error, changeset} =
+        Accounts.register_user(%{
+          email: "antonio@gmail.com",
+          username: "antonio_m",
+          full_name: "Marco Antonio",
+          location: "San Marino",
+          password: "Hulala4444",
+          website: "www.google.com"
+        })
+
+      assert %{website: ["Enter a valid website"]} = errors_on(changeset)
+    end
+
     test "registers users with a hashed password" do
       email = unique_user_email()
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
@@ -160,7 +174,7 @@ defmodule Instacamp.AccountsTest do
   describe "change_user/2" do
     test "returns a user changeset without password" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user(%User{})
-      assert changeset.required == [:email, :full_name, :username]
+      assert changeset.required == [:settings, :email, :full_name, :username]
     end
 
     test "allows fields to be set" do
@@ -299,13 +313,14 @@ defmodule Instacamp.AccountsTest do
   describe "change_user_password/2" do
     test "returns a user changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_password(%User{})
-      assert changeset.required == [:password]
+      assert changeset.required == [:password, :settings]
     end
 
     test "allows fields to be set" do
       changeset =
         Accounts.change_user_password(%User{}, %{
-          "password" => "new valid password"
+          "password" => "new valid password",
+          "settings" => %{}
         })
 
       assert changeset.valid?
@@ -351,7 +366,8 @@ defmodule Instacamp.AccountsTest do
     test "updates the password", %{user: user} do
       {:ok, user} =
         Accounts.update_user_password(user, valid_user_password(), %{
-          password: "new valid password"
+          password: "new valid password",
+          settings: %{}
         })
 
       assert is_nil(user.password)
@@ -363,7 +379,8 @@ defmodule Instacamp.AccountsTest do
 
       {:ok, _} =
         Accounts.update_user_password(user, valid_user_password(), %{
-          password: "new valid password"
+          password: "new valid password",
+          settings: %{}
         })
 
       refute Repo.get_by(UserToken, user_id: user.id)
@@ -548,14 +565,19 @@ defmodule Instacamp.AccountsTest do
     end
 
     test "updates the password", %{user: user} do
-      {:ok, updated_user} = Accounts.reset_user_password(user, %{password: "new valid password"})
+      {:ok, updated_user} =
+        Accounts.reset_user_password(user, %{password: "new valid password", settings: %{}})
+
       assert is_nil(updated_user.password)
       assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
     end
 
     test "deletes all tokens for the given user", %{user: user} do
       _token = Accounts.generate_user_session_token(user)
-      {:ok, _} = Accounts.reset_user_password(user, %{password: "new valid password"})
+
+      {:ok, _} =
+        Accounts.reset_user_password(user, %{password: "new valid password", settings: %{}})
+
       refute Repo.get_by(UserToken, user_id: user.id)
     end
   end

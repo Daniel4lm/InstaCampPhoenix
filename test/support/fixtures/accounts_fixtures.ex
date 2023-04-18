@@ -14,7 +14,8 @@ defmodule Instacamp.AccountsFixtures do
       username: unique_username(),
       full_name: "Marco Antonio",
       location: "San Marino",
-      password: valid_user_password()
+      password: valid_user_password(),
+      settings: %{}
     })
   end
 

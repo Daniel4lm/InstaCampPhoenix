@@ -21,9 +21,10 @@ defmodule Instacamp.BlogFixtures do
         post \\ %Posts.Post{},
         %Accounts.User{} = user,
         action,
-        attrs \\ %{}
+        attrs \\ %{},
+        tags_list \\ ["elixir", "dev", "city"]
       ) do
-    tags = blog_tag_fixture(["elixir", "dev", "city"])
+    tags = blog_tag_fixture(tags_list)
 
     attrs =
       Enum.into(attrs, %{

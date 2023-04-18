@@ -28,6 +28,7 @@ defmodule InstacampWeb.ConnCase do
 
       # The default endpoint for testing
       @endpoint InstacampWeb.Endpoint
+      use InstacampWeb, :verified_routes
     end
   end
 

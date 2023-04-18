@@ -17,7 +17,7 @@ defmodule InstacampWeb.UserAuthLive.UserResetPassword.Edit do
       <section class="w-[90%] bg-white md:w-2/3 xl:w-[40rem] border flex flex-col place-items-center mx-auto p-6 rounded-lg mt-8">
         <h1 class="text-3xl font-semibold text-gray-700">Reset Password</h1>
         <.form
-          let={f}
+          :let={f}
           for={@changeset}
           id="user-change-pass-form"
           phx-submit="save"
@@ -68,17 +68,11 @@ defmodule InstacampWeb.UserAuthLive.UserResetPassword.Edit do
 
       <section class="w-[90%] bg-white md:w-2/3 xl:w-[40rem] border flex flex-col place-items-center mx-auto p-6 rounded-lg my-6">
         <p class="text-lg text-gray-600">
-          <%= live_redirect("Register",
-            to: Routes.user_auth_sign_up_path(@socket, :new),
-            class: "text-light-blue-500 font-semibold"
-          ) %>
+          <.link navigate={~p"/auth/signup"} class="text-indigo-500 font-semibold">Register</.link>
         </p>
         |
         <p class="text-lg text-gray-600">
-          <%= live_redirect("Log in",
-            to: Routes.user_auth_login_path(@socket, :new),
-            class: "text-light-blue-500 font-semibold"
-          ) %>
+          <.link href={~p"/auth/login"} class="text-indigo-500 font-semibold">Log in</.link>
         </p>
       </section>
     </div>

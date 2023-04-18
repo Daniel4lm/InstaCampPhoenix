@@ -6,7 +6,7 @@ defmodule InstacampWeb.Components.Posts.TagComponent do
   alias Instacamp.Posts
   alias InstacampWeb.Components.Icons
   alias InstacampWeb.Endpoint
-  alias InstacampWeb.PostTopicHelper
+  alias InstacampWeb.TopicHelper
 
   @impl Phoenix.LiveComponent
   def update(assigns, socket) do
@@ -57,13 +57,13 @@ defmodule InstacampWeb.Components.Posts.TagComponent do
 
   defp broadcast_on_post_bookmark(bookmark) do
     bookmark.post_id
-    |> PostTopicHelper.post_bookmark_topic()
+    |> TopicHelper.post_bookmark_topic()
     |> Endpoint.broadcast("bookmark_post", %{bookmark: bookmark})
   end
 
   defp broadcast_on_post_unbookmark(bookmark) do
     bookmark.post_id
-    |> PostTopicHelper.post_bookmark_topic()
+    |> TopicHelper.post_bookmark_topic()
     |> Endpoint.broadcast("bookmark_post", %{bookmark: nil})
   end
 end

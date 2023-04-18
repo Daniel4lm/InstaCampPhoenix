@@ -13,12 +13,10 @@ defmodule InstacampWeb.FeatureCase do
   using do
     quote do
       use Wallaby.Feature
+      # use Wallaby.DSL
 
       import InstacampWeb.FeatureCase
       import Wallaby.Query
-
-      # use Wallaby.DSL
-      alias InstacampWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
       @endpoint InstacampWeb.Endpoint
@@ -67,6 +65,11 @@ defmodule InstacampWeb.FeatureCase do
     Browser.visit(session, "/")
   end
 
+  @spec visit_login_path(session()) :: session()
+  def visit_login_path(session) do
+    Browser.visit(session, "/auth/login")
+  end
+
   @spec open_post_page(session(), Posts.Post.t()) :: session()
   def open_post_page(session, %Posts.Post{} = post) do
     Browser.visit(session, "/post/" <> post.slug)
@@ -78,7 +81,6 @@ defmodule InstacampWeb.FeatureCase do
 
     session
     |> Browser.visit("/dev/mailbox")
-    |> wait(4000)
     |> Browser.all(list_group_item)
     |> List.first()
     |> Element.click()

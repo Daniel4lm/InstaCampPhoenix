@@ -3,12 +3,14 @@ defmodule InstacampWeb.LiveHooks do
     Live Hooks module
 
   """
+  use InstacampWeb, :verified_routes
+
+  import Phoenix.Component
   import Phoenix.LiveView
 
   alias Instacamp.Accounts
   alias Instacamp.Notifications
   alias InstacampWeb.Components.Navigation.NotificationsComponent
-  alias InstacampWeb.Router.Helpers, as: Routes
   alias Phoenix.Ecto.SQL.Sandbox
 
   @type socket :: Phoenix.LiveView.Socket.t()
@@ -24,21 +26,34 @@ defmodule InstacampWeb.LiveHooks do
   end
 
   def on_mount(:assign_user, _params, session, socket) do
-    socket = maybe_assign_user(socket, session)
-
-    {:cont, socket}
+    {:cont, maybe_assign_user(socket, session)}
   end
 
-  def on_mount(:ensure_authentication, _params, _session, socket) do
-    case socket.assigns.current_user do
+  def on_mount(:assign_theme_mode, _params, session, socket) do
+    updated_socket = maybe_assign_user(socket, session)
+
+    {:cont, maybe_change_theme_mode(updated_socket)}
+  end
+
+  def on_mount(:ensure_authentication, _params, session, socket) do
+    updated_socket = maybe_assign_user(socket, session)
+
+    case updated_socket.assigns.current_user do
       nil ->
-        {:halt,
-         socket
-         |> put_flash(:info, "You must log in to access this page.")
-         |> redirect(to: Routes.user_auth_sign_up_path(socket, :new))}
+        {:halt, redirect(updated_socket, to: ~p"/auth/login")}
 
       %Accounts.User{} ->
-        {:cont, socket}
+        {:cont, updated_socket}
+    end
+  end
+
+  def on_mount(:redirect_if_user_is_authenticated, _params, session, socket) do
+    updated_socket = maybe_assign_user(socket, session)
+
+    if updated_socket.assigns.current_user do
+      {:halt, redirect(updated_socket, to: ~p"/")}
+    else
+      {:cont, updated_socket}
     end
   end
 
@@ -85,22 +100,23 @@ defmodule InstacampWeb.LiveHooks do
          %Phoenix.Socket.Broadcast{
            event: "notify_user",
            payload: %{},
-           topic: "user_notification:" <> _user_id
+           topic: "user_notification:" <> user_id
          } = _message,
          socket
        ) do
+    user_nofifies = Notifications.list_user_notifications(user_id)
+
     send_update(NotificationsComponent,
       id: "notifications-comp",
       current_user: socket.assigns.current_user,
-      unread_notifications?: true
+      unread_notifications?: true,
+      notifications: user_nofifies
     )
 
     {:halt, socket}
   end
 
-  defp handle_user_notifications(_message, socket) do
-    {:cont, socket}
-  end
+  defp handle_user_notifications(_message, socket), do: {:cont, socket}
 
   defp maybe_assign_user(socket, session) do
     case session do
@@ -111,6 +127,17 @@ defmodule InstacampWeb.LiveHooks do
 
       _no_token ->
         assign_new(socket, :current_user, fn -> nil end)
+    end
+  end
+
+  defp maybe_change_theme_mode(%{assigns: %{current_user: current_user}} = socket) do
+    case current_user do
+      nil ->
+        assign(socket, :theme_mode, :light)
+
+      _user ->
+        %{settings: %{theme_mode: theme_mode}} = current_user
+        assign(socket, :theme_mode, theme_mode)
     end
   end
 

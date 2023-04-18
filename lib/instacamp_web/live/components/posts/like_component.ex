@@ -6,7 +6,7 @@ defmodule InstacampWeb.Components.Posts.LikeComponent do
   alias Instacamp.Posts
   alias InstacampWeb.Components.Icons
   alias InstacampWeb.Endpoint
-  alias InstacampWeb.PostTopicHelper
+  alias InstacampWeb.TopicHelper
 
   @impl Phoenix.LiveComponent
   def update(assigns, socket) do
@@ -51,26 +51,28 @@ defmodule InstacampWeb.Components.Posts.LikeComponent do
   defp notify_broadcast(user_id) do
     Endpoint.broadcast_from(
       self(),
-      PostTopicHelper.user_notification_topic(user_id),
+      TopicHelper.user_notification_topic(user_id),
       "notify_user",
       %{}
     )
   end
 
   defp like_broadcast(:post, resource) do
+    updated_post = Posts.get_post!(resource.id)
+
     resource.id
-    |> PostTopicHelper.post_or_comment_like_topic()
-    |> Endpoint.broadcast("like_post", %{post_id: resource.id})
+    |> TopicHelper.post_or_comment_like_topic()
+    |> Endpoint.broadcast("like_post", %{post: updated_post})
 
     resource.user_id
-    |> PostTopicHelper.user_posts_topic()
-    |> Endpoint.broadcast("like_post", %{post_id: resource.id})
+    |> TopicHelper.user_posts_topic()
+    |> Endpoint.broadcast("like_post", %{post: updated_post})
   end
 
   defp like_broadcast(:comment, resource) do
     resource.post_id
-    |> PostTopicHelper.post_or_comment_like_topic()
-    |> Endpoint.broadcast("like_post_comment", %{})
+    |> TopicHelper.post_or_comment_like_topic()
+    |> Endpoint.broadcast("like_post_comment", %{comment_id: resource.id})
   end
 
   defp is_liked?(user, resource) do

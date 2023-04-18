@@ -1,117 +1,107 @@
-<header class="relative flex justify-center items-center flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t md:border dark:border-none w-full md:rounded-2xl md:shadow-md md:shadow-slate-100 dark:shadow-none md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 pt-10 mt-10 pb-4">
-  <!-- Profile Picture Section -->
+<header class="relative flex justify-center items-center flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t md:border dark:border-none w-full md:rounded-2xl md:shadow-md md:shadow-slate-100 dark:shadow-none md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto md:px-10 pt-10 mt-10 pb-4">
   <div class="w-full mb-4">
     <%= img_tag(@user.avatar_url,
       class:
-        "w-20 h-20 md:w-28 md:h-28 bg-white dark:bg-slate-400 border-4 border-indigo-200 dark:border-slate-300 p-[0.2rem] mx-auto -mt-20 rounded-full object-cover object-center"
+        "absolute xs:relative w-20 h-20 md:w-28 md:h-28 ml-4 xs:mx-auto -mt-20 bg-white dark:bg-slate-400 border-4 border-indigo-200 dark:border-slate-300 p-[0.2rem] rounded-full object-cover object-center"
     ) %>
   </div>
-  <!-- END Profile Picture Section -->
 
-  <!-- User following/followers section -->
-  <%= if @live_action in [:following, :followers] do %>
-    <.modal
-      return_to={Routes.user_profile_path(@socket, :index, @user.username)}
-      w_size="w-[90%] sm:w-3/4 md:w-1/2 xl:w-1/3"
-    >
+  <.modal_dialog
+    :if={@live_action in [:following, :followers]}
+    id="follow-list"
+    class="w-[90%] sm:w-3/4 md:w-1/2 xl:w-1/3 h-auto rounded-xl mx-auto my-1/2 bg-gray-50 border border-gray-600 dark:border-gray-400 fade-in-scale overflow-auto"
+    return_to={~p"/user/#{@user.username}"}
+  >
+    <.live_component
+      action={@live_action}
+      current_user={@current_user}
+      follow_list={if(@live_action == :following, do: @following, else: @followers)}
+      id={@user.id || :follow}
+      module={FollowListComponent}
+    />
+  </.modal_dialog>
+
+  <section class="w-full">
+    <div class="absolute flex flex-col md:flex-row items-center md:justify-start px-3 top-3 right-2">
       <.live_component
-        action={@live_action}
         current_user={@current_user}
-        follow_list={if(@live_action == :following, do: @following, else: @followers)}
-        id={@user.id || :follow}
-        module={FollowListComponent}
-        return_to={Routes.user_profile_path(@socket, :index, @user.username)}
+        id={@user.id}
+        module={FollowComponent}
+        user={@user}
       />
-    </.modal>
-  <% end %>
-  <!-- END User following/followers section -->
-  <section>
-    <div class="sm:absolute flex flex-col md:flex-row items-center md:justify-start px-3 pt-3 sm:top-2 sm:right-2">
-      <div class="my-2 md:my-0 md:ml-4">
-        <%= cond do %>
-          <% @current_user && @current_user.id == @user.id -> %>
-            <%= live_patch("Edit Profile",
-              to: Routes.live_path(@socket, InstacampWeb.SettingsLive.Settings),
-              class:
-                "py-1 px-4 border-2 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-inherit"
-            ) %>
-          <% @current_user -> %>
-            <.live_component
-              current_user={@current_user}
-              id={@user.id}
-              module={FollowComponent}
-              socket={@socket}
-              user={@user}
-            />
-          <% true -> %>
-            <%= link("Follow",
-              to: Routes.user_auth_login_path(@socket, :new),
-              class:
-                "py-1 px-5 border-none shadow rounded-full text-gray-50 hover:bg-light-blue-600 bg-light-blue-500"
-            ) %>
-        <% end %>
+    </div>
+
+    <div class="flex flex-col xs:items-center p-4">
+      <div class="flex items-center gap-2 md:flex-col">
+        <h2 class="text-xl md:text-2xl font-semibold my-2">
+          <%= @user.full_name %>
+        </h2>
+        <.link
+          :if={is_map_key(@user, :website) && @user.website}
+          href={@user.website}
+          target="_blank"
+          rel="noreferrer"
+          class="flex items-center justify-center my-1 px-2 py-1 text-sm xs:text-base rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
+        >
+          <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.globe_icon /></div>
+          <span class="font-medium mr-1"><%= display_website_uri(@user.website) %></span>
+        </.link>
       </div>
+      <p class="max-w-full break-words my-2">
+        <%= if @user.bio do %>
+          <%= @user.bio %>
+        <% else %>
+          No bio found
+        <% end %>
+      </p>
     </div>
 
-    <div class="flex flex-col items-center p-3">
-      <h2 class="text-xl md:text-2xl font-semibold my-2">
-        <%= @user.full_name %>
-      </h2>
-      <%= if @user.bio do %>
-        <p class="max-w-full break-words"><%= @user.bio %></p>
-      <% else %>
-        <p class="max-w-full break-words">No bio found</p>
-      <% end %>
-      <%= if is_map_key(@user, :website) && @user.website do %>
-        <%= link(display_website_uri(@user.website),
-          to: @user.website,
-          target: "_blank",
-          rel: "noreferrer",
-          class: "text-blue-700"
-        ) %>
-      <% end %>
-    </div>
-
-    <ul class="flex justify-center flex-wrap p-0 text-sm md:text-base">
-      <li id="profile-posts-count" class="flex items-center justify-center my-1">
-        <div class="text-indigo-500 dark:text-blue-400"><Icons.pin_icon /></div>
+    <ul class="flex xs:justify-center flex-wrap gap-2 xs:gap-8 px-4 xs:p-0 text-sm md:text-base">
+      <li
+        :if={@user.location}
+        id="profile-posts-count"
+        class="flex items-center justify-center my-1"
+      >
+        <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.pin_icon /></div>
         <span>Location <b><%= @user.location %></b></span>
       </li>
-      <%= live_patch to: Routes.user_profile_path(@socket, :followers, @user.username) do %>
+
+      <.link patch={~p"/user/#{@user.username}/followers"}>
         <li
-          class="flex items-center justify-center my-1 p-2 ml-8 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500"
+          class="flex items-center justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
           id="profile-followers-count"
         >
           <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
           <span>Followers <b><%= @user.followers_count %></b></span>
         </li>
-      <% end %>
-      <%= live_patch to: Routes.user_profile_path(@socket, :following, @user.username) do %>
+      </.link>
+
+      <.link patch={~p"/user/#{@user.username}/following"}>
         <li
-          class="flex items-center justify-center my-1 p-2 ml-8 rounded-md hover:bg-gray-100 dark:hover:bg-slate-500"
+          class="flex items-center justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
           id="profile-following-count"
         >
           <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
           <span>Following <b><%= @user.following_count %></b></span>
         </li>
-      <% end %>
+      </.link>
     </ul>
   </section>
 </header>
 
-<section class="flex justify-center items-center flex-col bg-white dark:bg-slate-600 text-gray-600 dark:text-slate-100 w-full md:rounded-xl border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 py-2 md:my-4">
+<section class="flex xs:justify-center xs:items-center flex-col bg-white dark:bg-slate-600 text-gray-600 dark:text-slate-100 w-full md:rounded-xl border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-4 xs:px-10 py-2 md:my-4">
   <p class="text-md md:text-lg font-semibold my-2">Recent activity</p>
 
-  <ul class="flex justify-center flex-wrap p-2 text-sm md:text-base">
+  <ul class="flex xs:justify-center flex-wrap gap-x-8 md:p-2 text-sm md:text-base">
     <li class="flex items-center justify-center my-1" id="profile-posts-count">
       <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.post_icon /></div>
       <span>Posts <b><%= @user.posts_count %></b></span>
     </li>
-    <li class="flex items-center justify-center my-1 ml-8" id="profile-comments-count">
+    <li class="flex items-center justify-center my-1 " id="profile-comments-count">
       <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.comment_icon /></div>
       <span>Comments <b><%= @comments_count %></b></span>
     </li>
-    <li class="flex items-center justify-center my-1 ml-8" id="profile-taged-count">
+    <li class="flex items-center justify-center my-1 " id="profile-taged-count">
       <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.taged_icon /></div>
       <span>Taged posts <b><%= @bookmarks_count %></b></span>
     </li>
@@ -120,29 +110,31 @@
 
 <section class="w-full min-h-[45vh] bg-white dark:bg-slate-600 dark:text-slate-100 md:rounded-xl border-t border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto md:px-8 pb-8 mb-1 mt-4 md:mt-0">
   <ul class="flex justify-center text-center space-x-20 border-b-2 dark:border-slate-400 mt-5">
-    <%= live_patch to: Routes.user_profile_path(@socket, :index, @user.username) do %>
+    <.link patch={~p"/user/{@user.username}"}>
       <li class="pb-4 px-1 text-sm md:text-base hover:cursor-pointer border-b-2 dark:border-transparent hover:text-gray-500 dark:hover:text-inherit hover:border-black dark:hover:border-blue-400 -mb-0.5">
         Posts
       </li>
-    <% end %>
+    </.link>
 
-    <%= live_redirect to: Routes.saved_list_path_path(@socket, :list) do %>
+    <.link navigate={~p"/saved-list"}>
       <li class="pb-4 px-1 text-sm md:text-base hover:cursor-pointer border-b-2 dark:border-transparent hover:text-gray-500 dark:hover:text-inherit hover:border-black dark:hover:border-blue-400 -mb-0.5">
         Saved
       </li>
-    <% end %>
+    </.link>
   </ul>
-  <!-- Posts list -->
-  <div id="user-posts" phx-update="append" class="flex flex-col mt-9">
-    <%= for post <- @user_posts do %>
-      <PostCardComponent.card socket={@socket} post={post} current_user={@current_user} />
-    <% end %>
+
+  <div id="user-posts" phx-update="stream" class="flex flex-col mt-9">
+    <PostCardComponent.small_card
+      :for={{user_post_id, post} <- @streams.user_posts}
+      id={user_post_id}
+      post={post}
+      current_user={@current_user}
+    />
   </div>
-  <!-- End Posts list -->
 </section>
 
 <%= if @show_posts_loader? do %>
-  <div id="infinite-scroll-marker" phx-hook="UserProfileInfiniteScroll" data-page-number={@page}>
+  <div id="infinite-scroll-marker" phx-hook="PostsPageInfiniteScroll" data-page-number={@page}>
   </div>
-  <div class="loader"></div>
+  <div class="loader text-gray-300 dark:text-slate-400"></div>
 <% end %>

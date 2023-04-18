@@ -56,15 +56,15 @@ h6 {
 }
 
 .alert-info {
-  @apply bg-[#eff8ff] border border-[#6cb2eb] text-[#2779bd] px-4 py-5 relative;
+  @apply bg-[#eff8ff] border border-[#6cb2eb] text-[#2779bd] relative;
 }
 
 .alert-warning {
-  @apply bg-[#fff5eb] border border-[#faad63] text-[#de751f] px-4 py-3 relative;
+  @apply bg-[#fff5eb] border border-[#faad63] text-[#de751f] relative;
 }
 
 .alert-danger {
-  @apply bg-[#fcebea] border border-[#ef5753] text-[#cc1f1a] px-4 py-3 relative;
+  @apply bg-[#fcebea] border border-[#ef5753] text-[#cc1f1a] relative;
 }
 
 .alert p {
@@ -105,10 +105,7 @@ h6 {
 }
 
 .phx-modal-close {
-  /* color: #aaa; */
   float: right;
-  font-size: 28px;
-  font-weight: bold;
 }
 
 .phx-modal-close:hover,
@@ -161,7 +158,7 @@ h6 {
 }
 
 .invalid-feedback {
-  @apply text-[#B9121C] block m-2 dark:text-red-500;
+  @apply text-[#B9121C] block my-2 dark:text-red-500;
   animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
 }
 
@@ -184,7 +181,8 @@ h6 {
   display: none; /* Chrome, Safari, Opera */
 }
 
-#post-body > pre {
+#post-body > pre,
+trix-editor > pre {
   @apply block text-[0.7em] sm:text-[0.8em] md:text-[0.95em] text-[#ccc] rounded-lg bg-[#2d2d2d] my-2 whitespace-pre-wrap break-words leading-5 py-3 px-2;
 }
 
@@ -209,7 +207,7 @@ trix-editor:focus {
 }
 
 trix-editor::placeholder {
-  @apply dark:text-slate-400;
+  @apply dark:text-slate-100;
 }
 
 trix-editor > ol,
@@ -251,7 +249,7 @@ trix-editor > ol > li,
 }
 
 trix-toolbar .trix-button-row {
-  @apply overflow-y-hidden pl-1 pr-1 mb-1 border rounded-md dark:!border-transparent;
+  @apply overflow-y-hidden pl-1 pr-1 mb-1;
 }
 
 trix-toolbar .trix-button-group {
@@ -387,64 +385,43 @@ trix-toolbar .trix-button.trix-active {
 .loader,
 .loader:before,
 .loader:after {
-  border-radius: 6px;
+  border-radius: 50%;
   width: 2.5em;
   height: 2.5em;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
-  -webkit-animation: loading 1.4s infinite ease-in-out;
-  animation: loading 1.4s infinite ease-in-out;
+  animation: bblFadInOut 1.6s infinite ease-in-out;
+  -webkit-animation: bblFadInOut 1.6s infinite ease-in-out;
 }
-
 .loader {
-  color: rgb(160, 156, 224);
-  font-size: 10px;
-  margin: 40px auto;
+  font-size: 7px;
   position: relative;
+  margin: auto;
+  margin-bottom: 40px;
   text-indent: -9999em;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
   transform: translateZ(0);
-  -webkit-animation-delay: -0.16s;
   animation-delay: -0.16s;
 }
-
 .loader:before,
 .loader:after {
   content: "";
   position: absolute;
   top: 0;
 }
-
 .loader:before {
   left: -3.5em;
-  -webkit-animation-delay: -0.32s;
   animation-delay: -0.32s;
 }
-
 .loader:after {
   left: 3.5em;
 }
 
-@-webkit-keyframes loading {
+@keyframes bblFadInOut {
   0%,
   80%,
   100% {
     box-shadow: 0 2.5em 0 -1.3em;
   }
-
-  40% {
-    box-shadow: 0 2.5em 0 0;
-  }
-}
-
-@keyframes loading {
-  0%,
-  80%,
-  100% {
-    box-shadow: 0 2.5em 0 -1.3em;
-  }
-
   40% {
     box-shadow: 0 2.5em 0 0;
   }

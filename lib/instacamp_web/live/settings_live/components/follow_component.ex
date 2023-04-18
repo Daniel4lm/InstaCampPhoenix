@@ -5,11 +5,18 @@ defmodule InstacampWeb.SettingsLive.Components.FollowComponent do
 
   alias Instacamp.Accounts
   alias InstacampWeb.Endpoint
-  alias InstacampWeb.PostTopicHelper
+  alias InstacampWeb.TopicHelper
 
   @impl Phoenix.LiveComponent
-  def update(assigns, socket) do
-    user_follow = Accounts.get_following(assigns.current_user.id, assigns.user.id)
+  def update(%{current_user: nil} = assigns, socket) do
+    {:ok,
+     socket
+     |> assign(:state_text, "Follow")
+     |> assign(assigns)}
+  end
+
+  def update(%{current_user: current_user, user: user} = assigns, socket) do
+    user_follow = Accounts.get_following(current_user.id, user.id)
 
     {:ok,
      socket
@@ -25,7 +32,34 @@ defmodule InstacampWeb.SettingsLive.Components.FollowComponent do
   end
 
   @impl Phoenix.LiveComponent
-  def render(assigns) do
+  def render(%{current_user: nil} = assigns) do
+    ~H"""
+    <div class="my-2">
+      <.link
+        href={~p"/auth/login"}
+        class="py-1 px-5 border-none shadow rounded-full text-gray-50 hover:bg-light-blue-600 bg-light-blue-500"
+      >
+        <%= @state_text %>
+      </.link>
+    </div>
+    """
+  end
+
+  def render(%{current_user: current_user, user: user} = assigns)
+      when current_user.id == user.id do
+    ~H"""
+    <div class="my-2">
+      <.link
+        patch={~p"/accounts/edit"}
+        class="py-1 px-4 border-2 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-inherit"
+      >
+        Edit Profile
+      </.link>
+    </div>
+    """
+  end
+
+  def render(%{current_user: _current_user} = assigns) do
     ~H"""
     <button
       id="follow-component"
@@ -79,10 +113,11 @@ defmodule InstacampWeb.SettingsLive.Components.FollowComponent do
     updated_user = Accounts.create_follow(current_user, user, current_user)
 
     send(self(), {__MODULE__, :update_user_profile, updated_user})
+    follow_broadcast(updated_user)
 
     Endpoint.broadcast_from(
       self(),
-      PostTopicHelper.user_notification_topic(user.id),
+      TopicHelper.user_notification_topic(user.id),
       "notify_user",
       %{}
     )
@@ -97,11 +132,18 @@ defmodule InstacampWeb.SettingsLive.Components.FollowComponent do
     updated_user = Accounts.unfollow(current_user_id, user_id)
 
     send(self(), {__MODULE__, :update_user_profile, updated_user})
+    follow_broadcast(updated_user)
 
     {:noreply,
      socket
      |> assign(:state_text, "Follow")
      |> assign(:follow_btn_style, "user-profile-follow-btn")}
+  end
+
+  defp follow_broadcast(user) do
+    user.id
+    |> TopicHelper.following_topic()
+    |> Endpoint.broadcast("follow_user", %{user: user})
   end
 
   defp get_follow_btn_style("unfollow") do

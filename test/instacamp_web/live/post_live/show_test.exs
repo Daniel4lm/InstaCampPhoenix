@@ -16,6 +16,7 @@ defmodule InstacampWeb.PostLive.ShowTest do
     } do
       {:ok, post_live, html} = live(conn, Routes.post_show_path(conn, :show, post_2.slug))
 
+      assert page_title(post_live) =~ post_2.title
       assert html =~ user_2.full_name
       assert html =~ DateTimeHelper.format_post_date(post_2.updated_at)
       assert html =~ "Damirs post"
@@ -49,14 +50,14 @@ defmodule InstacampWeb.PostLive.ShowTest do
 
       _updated_html =
         post_live
-        |> form("#comment-input-form", comment: %{body: ""})
+        |> form("#new-comment-form", comment: %{body: ""})
         |> render_submit()
 
       assert has_element?(post_live, "#post-total-comments", "0")
 
       _updated_html =
         post_live
-        |> form("#comment-input-form")
+        |> form("#new-comment-form")
         |> render_submit(
           comment: %{
             body: "Hii. This is my first comment"
@@ -70,7 +71,7 @@ defmodule InstacampWeb.PostLive.ShowTest do
       [comment] = preloaded_post_2.comment
 
       refute has_element?(post_live, "#like-component-" <> comment.id)
-      assert has_element?(post_live, "#comment-likes-count-" <> comment.id, "0")
+      assert has_element?(post_live, "#likes-count-for-" <> comment.id, "0")
     end
 
     test "user can visit his own page", %{

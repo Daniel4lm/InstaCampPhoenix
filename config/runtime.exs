@@ -80,4 +80,26 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  mailgun_api_key =
+    System.get_env("MAILGUN_API_KEY") ||
+      raise """
+      environment variable MAILGUN_API_KEY is missing.
+      """
+
+  mailgun_domain_name =
+    System.get_env("MAILGUN_DOMAIN_NAME") ||
+      raise """
+      environment variable MAILGUN_DOMAIN_NAME is missing.
+      """
+
+  if config_env() == :dev or config_env() == :dev do
+    # Configuring the mailer
+    config :instacamp, Instacamp.Mailer,
+      adapter: Swoosh.Adapters.Mandrill,
+      api_key: mailgun_api_key,
+      domain: mailgun_domain_name
+
+    config :swoosh, :api_client, Swoosh.ApiClient.Finch
+  end
 end

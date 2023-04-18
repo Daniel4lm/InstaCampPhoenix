@@ -1,14 +1,14 @@
-<section class="flex flex-col md:flex-row md:w-10/12 2xl:w-8/12 mx-4 md:mx-auto my-6 mt-6">
+<section class="flex flex-col md:flex-row md:w-11/12 xl:w-8/12 2xl:w-7/12 mx-4 md:mx-auto my-6 mt-6">
   <SettingsSidebarComponent.settings_sidebar
-    class="w-full md:w-1/4 border rounded-lg bg-white dark:bg-slate-600 dark:text-slate-100 dark:border-transparent shadow-md dark:shadow-none shadow-slate-200 mb-2 md:mb-0 md:mr-2"
+    class="w-full md:w-1/3 h-max text-sm md:text-base border rounded-lg bg-white dark:bg-slate-600 dark:text-slate-100 dark:border-transparent shadow-md dark:shadow-none shadow-slate-200 mb-2 md:mb-0 md:mr-2"
     current_uri_path={@active_path}
     settings_path={@settings_path}
     pass_settings_path={@pass_settings_path}
   />
 
-  <div class="relative w-full py-8 border rounded-lg bg-white dark:bg-slate-600 dark:text-slate-100 dark:border-transparent shadow-md shadow-slate-200 dark:shadow-none">
+  <div class="relative w-full py-8 text-sm md:text-base border rounded-lg bg-white dark:bg-slate-600 dark:text-slate-100 dark:border-transparent shadow-md shadow-slate-200 dark:shadow-none">
     <.form
-      let={f}
+      :let={f}
       for={@password_changeset}
       id="update-password-form"
       phx-submit="update_password"
@@ -17,15 +17,27 @@
     >
       <div class="flex items-start flex-col md:flex-row md:items-center rounded-tl-none">
         <%= label(f, :password, "New Password",
-          class: "md:w-1/3 pl-8 mb-1 md:p-0 md:m-0 md:text-right"
+          class: "md:w-1/3 pl-4 xs:pl-8 mb-1 md:p-0 md:m-0 md:text-right"
         ) %>
-        <div class="relative w-full pl-8 pr-8">
-          <%= password_input(f, :password,
-            value: input_value(f, :password),
-            required: true,
-            class:
-              "w-full md:w-4/6 rounded dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
-          ) %>
+        <div class="relative w-full pl-4 xs:pl-8 pr-4 xs:pr-8">
+          <div class="relative w-full lg:w-4/6">
+            <%= password_input(f, :password,
+              value: input_value(f, :password),
+              required: true,
+              class:
+                "w-full rounded border-neutral-300 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 pr-8 text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
+            ) %>
+            <div
+              class="absolute w-6 h-6 top-1/2 right-2 -translate-y-1/2 text-gray-400 cursor-pointer"
+              id="user-registration-show-password"
+              phx-hook="InputShowPassword"
+              data-input-id={input_id(f, :password)}
+            >
+              <div id="show-password-icon">
+                <Icons.hidden_icon id={input_id(f, :password)} />
+              </div>
+            </div>
+          </div>
           <div class="absolute top-full -translate-y-1">
             <%= error_tag(f, :password) %>
           </div>
@@ -34,15 +46,27 @@
 
       <div class="flex items-start flex-col md:flex-row md:items-center">
         <%= label(f, :password_confirmation, "Confirm New Password",
-          class: "md:w-1/3 pl-8 mb-1 md:p-0 md:m-0 md:text-right"
+          class: "md:w-1/3 pl-4 xs:pl-8 mb-1 md:p-0 md:m-0 md:text-right"
         ) %>
-        <div class="relative w-full pl-8 pr-8">
-          <%= password_input(f, :password_confirmation,
-            value: input_value(f, :password_confirmation),
-            required: true,
-            class:
-              "w-full md:w-4/6 rounded dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
-          ) %>
+        <div class="relative w-full pl-4 xs:pl-8 pr-4 xs:pr-8">
+          <div class="relative w-full lg:w-4/6 ">
+            <%= password_input(f, :password_confirmation,
+              value: input_value(f, :password_confirmation),
+              required: true,
+              class:
+                "w-full rounded border-neutral-300 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 pr-8 text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
+            ) %>
+            <div
+              class="absolute w-6 h-6 top-1/2 right-2 -translate-y-1/2 text-gray-400 cursor-pointer"
+              id="user-registration-show-password2"
+              phx-hook="InputShowPassword"
+              data-input-id={input_id(f, :password_confirmation)}
+            >
+              <div id="show-password-icon-2">
+                <Icons.hidden_icon id={input_id(f, :password_confirmation)} />
+              </div>
+            </div>
+          </div>
           <div class="absolute top-full -translate-y-1">
             <%= error_tag(f, :password_confirmation) %>
           </div>
@@ -51,18 +75,29 @@
 
       <div class="flex items-start flex-col md:flex-row md:items-center">
         <%= label(f, :current_password, "Old Password",
-          class: "md:w-1/3 pl-8 mb-1 md:p-0 md:m-0 md:text-right",
+          class: "md:w-1/3 pl-4 xs:pl-8 mb-1 md:p-0 md:m-0 md:text-right",
           for: "current_password_for_password"
         ) %>
-        <div class="relative w-full pl-8 pr-8">
-          <%= password_input(f, :current_password,
-            value: input_value(f, :current_password),
-            required: true,
-            name: "current_password",
-            id: "current_password_for_password",
-            class:
-              "w-full md:w-4/6 rounded dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
-          ) %>
+        <div class="relative w-full pl-4 xs:pl-8 pr-4 xs:pr-8">
+          <div class="relative w-full lg:w-4/6">
+            <%= password_input(f, :current_password,
+              value: input_value(f, :current_password),
+              required: true,
+              name: "current_password",
+              class:
+                "w-full rounded border-neutral-300 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 p-2 pr-8 text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
+            ) %>
+            <div
+              class="absolute w-6 h-6 top-1/2 right-2 -translate-y-1/2 text-gray-400 cursor-pointer"
+              id="user-registration-show-password3"
+              phx-hook="InputShowPassword"
+              data-input-id={input_id(f, :current_password)}
+            >
+              <div id="show-password-icon-3">
+                <Icons.hidden_icon id={input_id(f, :current_password)} />
+              </div>
+            </div>
+          </div>
           <div class="absolute top-full -translate-y-1">
             <%= error_tag(f, :current_password) %>
           </div>
@@ -71,7 +106,46 @@
 
       <div class="flex items-start flex-col md:flex-row md:items-center">
         <label class="block md:w-1/3 font-semibold text-right"></label>
-        <div class="w-full pl-8 pr-20">
+        <div class="relative w-full pl-4 xs:pl-8 pr-4 xs:pr-8">
+          <div class="lg:w-4/6 overflow-hidden rounded-lg border border-neutral-300 bg-white dark:border-slate-400 dark:bg-slate-700">
+            <button
+              id="pass-hystory"
+              class="group relative flex w-full items-center rounded-t-[15px] border-0 bg-white hover:bg-neutral-100 py-3 px-5 text-left text-sm md:text-base text-neutral-800 transition hover:z-[2] focus:z-[3] focus:outline-none dark:bg-slate-600 dark:text-white [&:not([data-te-collapse-collapsed])]:bg-white [&:not([data-te-collapse-collapsed])]:text-primary dark:[&:not([data-te-collapse-collapsed])]:bg-slate-700 dark:[&:not([data-te-collapse-collapsed])]:text-primary-400"
+              type="button"
+              phx-click={JS.toggle(to: "#collapse-body")}
+            >
+              Password history
+              <span class="ml-auto h-5 w-5 shrink-0 fill-[#336dec] transition-transform duration-200 ease-in-out group-[[data-te-collapse-collapsed]]:fill-[#212529] motion-reduce:transition-none dark:fill-blue-300 dark:group-[[data-te-collapse-collapsed]]:fill-white">
+                <Icons.select_arrow />
+              </span>
+            </button>
+            <div
+              id="collapse-body"
+              class="hidden border-t dark:border-slate-400"
+              aria-labelledby="headingOne"
+              data-te-parent="#accordionExample"
+            >
+              <div class="py-4 px-5 flex justify-between">
+                <%= unless @password_updated_at do %>
+                  <strong>Not changed yet</strong>
+                <% else %>
+                  <span><strong>Last changed</strong></span>
+                  <span>
+                    <%= DateTimeHelper.format_post_date(
+                      @password_updated_at,
+                      "%-d %b, %Y"
+                    ) %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-start flex-col md:flex-row md:items-center">
+        <label class="block md:w-1/3 font-semibold text-right"></label>
+        <div class="w-full pl-4 xs:pl-8 pr-20">
           <%= submit("Change Password",
             phx_disable_with: "Saving...",
             class:
@@ -82,11 +156,12 @@
 
       <div class="flex items-start flex-col md:flex-row md:items-center">
         <div class="w-full pl-8 pr-20 text-right">
-          <%= link("Forgot Password?",
-            to: Routes.user_reset_password_path(@socket, :new),
-            class:
-              "font-normal text-sm hover:text-indigo-400 text-indigo-500 cursor-pointer hover:underline"
-          ) %>
+          <.link
+            href={~p"/auth/reset-password"}
+            class="font-normal text-sm hover:text-indigo-400 text-indigo-500 cursor-pointer hover:underline"
+          >
+            Forgot Password?
+          </.link>
         </div>
       </div>
     </.form>

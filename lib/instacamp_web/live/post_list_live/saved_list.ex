@@ -8,7 +8,7 @@ defmodule InstacampWeb.PostListLive.SavedList do
   alias InstacampWeb.Endpoint
   alias InstacampWeb.PostListLive.SavedListComponents
   alias InstacampWeb.PostListLive.SettingsTabsComponent
-  alias InstacampWeb.PostTopicHelper
+  alias InstacampWeb.TopicHelper
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -16,15 +16,12 @@ defmodule InstacampWeb.PostListLive.SavedList do
 
     :ok =
       user.id
-      |> PostTopicHelper.user_notification_topic()
+      |> TopicHelper.user_notification_topic()
       |> Endpoint.subscribe()
 
-    saved_list_path = Routes.saved_list_path_path(socket, :list)
-    search_list_path = Routes.saved_list_path_path(socket, :search)
-
     setting_tabs = [
-      %{title: "Saved list", path: saved_list_path},
-      %{title: "Search", path: search_list_path}
+      %{title: "Saved list", path: ~p"/saved-list"},
+      %{title: "Search", path: ~p"/search-saved-list"}
     ]
 
     {
@@ -35,7 +32,6 @@ defmodule InstacampWeb.PostListLive.SavedList do
       |> assign_reading_list()
       |> assign(:search_list, [])
       |> assign(:setting_tabs, setting_tabs)
-      #  |> set_load_more_posts()
     }
   end
 
@@ -107,7 +103,7 @@ defmodule InstacampWeb.PostListLive.SavedList do
     {:ok, _deleted_bookmark} = Posts.unbookmark(post_bookmark)
 
     post_bookmark.post_id
-    |> PostTopicHelper.post_bookmark_topic()
+    |> TopicHelper.post_bookmark_topic()
     |> Endpoint.broadcast("bookmark_post", %{bookmark: nil})
 
     filtered_reading_list =
