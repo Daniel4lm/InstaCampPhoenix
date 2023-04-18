@@ -25,7 +25,6 @@ defmodule InstacampWeb.PostLive.EditComment do
               <trix-editor
                 input="comment_body"
                 class="min-h-[100px] rounded-md border-gray-400 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 text-justify overflow-hidden overflow-x-auto text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
-                placeholder="Write your blog post"
               >
               </trix-editor>
             </div>

@@ -15,20 +15,20 @@
       <div
         id="drag-drop-container"
         phx-hook="ImageUploadDragDropHook"
-        class="w-full md:w-3/4 border border-gray-200 dark:border-slate-400 rounded-xl mx-auto mb-4 py-4 px-4 text-center flex flex-col justify-center items-center min-h-[220px]"
+        class="w-full md:w-3/4 border border-gray-250 dark:border-slate-400 rounded-xl mx-auto mb-4 py-4 px-4 text-center flex flex-col justify-center items-center min-h-[220px]"
         phx-drop-target={@uploads.post_photo_url.ref}
       >
         <%= if Enum.empty?(@uploads.post_photo_url.entries) do %>
           <p class="drag-sub-el font-bold text-md md:text-xl mb-3">
             Upload your image
           </p>
-          <p class="drag-sub-el text-sm md:text-base font-thin text-gray-400">
+          <p class="drag-sub-el text-sm md:text-base font-light text-gray-500">
             Your file must be in JPG or PNG format
           </p>
           <label for={@uploads.post_photo_url.ref} class="flex cursor-pointer justify-center my-8">
             <Icons.upload />
           </label>
-          <p class="drag-sub-el text-sm md:text-base font-thin text-gray-400">
+          <p class="drag-sub-el text-sm md:text-base font-light text-gray-500">
             Drag and drop or browse to choose a file
           </p>
         <% end %>
@@ -119,7 +119,7 @@
           <trix-editor
             input="body_input"
             class="min-h-[140px] rounded-md border-gray-400 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 text-justify overflow-hidden overflow-x-auto text-semibold text-gray-600 focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-90 focus:border-transparent dark:focus:border-transparent dark:focus:ring-blue-400"
-            placeholder="Write your blog post"
+            placeholder="Write your blog post..."
             phx_debounce="blur"
           >
           </trix-editor>
