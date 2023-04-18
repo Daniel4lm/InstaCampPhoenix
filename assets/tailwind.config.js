@@ -23,6 +23,10 @@ module.exports = {
         'search-icon': "url('../images/search.svg')",
         'search-icon-dark': "url('../images/search-dark.svg')",
       },
+      boxShadow: {
+        'card-shadow': '0px 0px 4px 0px rgb(219, 223, 227)',
+        'card-shadow-hover': '0px 0px 6px 2px rgb(210, 209, 209)',
+      },
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
       },
