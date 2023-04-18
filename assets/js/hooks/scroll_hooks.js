@@ -12,9 +12,25 @@ ScrollHooks.ScrollToComments = {
 
 ScrollHooks.ScrollToTop = {
     mounted() {
-        this.el.addEventListener('click', () => {
-            const section = document.getElementById('post-wrapper')
-            section.scroll({
+
+        const scrollToTopButton = this.el
+        const contentSection = document.getElementById('post-wrapper')
+
+        contentSection.addEventListener('scroll', () => {
+            if (contentSection.scrollTop > 400) {
+                scrollToTopButton.classList.replace('invisible', 'visible')
+                scrollToTopButton.classList.replace('opacity-0', 'opacity-1')
+                scrollToTopButton.classList.replace('sm:-bottom-10', 'sm:bottom-5')
+            } else {
+                scrollToTopButton.classList.replace('visible', 'invisible')
+                scrollToTopButton.classList.replace('opacity-1', 'opacity-0')
+                scrollToTopButton.classList.replace('sm:bottom-5', 'sm:-bottom-10')
+            }
+        })
+
+
+        scrollToTopButton.addEventListener('click', () => {
+            contentSection.scroll({
                 top: 0,
                 left: 0,
                 behavior: 'smooth'

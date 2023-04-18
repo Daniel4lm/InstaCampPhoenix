@@ -147,12 +147,12 @@
           </.link>
         </ul>
       </div>
-      <div
-        id="scroll-to-top"
-        class="flex sm:flex-col py-2 items-center cursor-pointer"
-        phx-hook="ScrollToTop"
-      >
-        <div class="rounded-xl p-2 cursor-pointer border border-transparent hover:border-sky-200 hover:bg-sky-100 dark:hover:bg-slate-500 dark:hover:border-transparent">
+      <div id="scroll-to-container" phx-update="ignore" class="flex items-center">
+        <div
+          id="scroll-to-top"
+          class="invisible sm:fixed duration-300 ease-in-out opacity-0 flex items-center cursor-pointer right-5 md:right-auto md:left-5 xl:left-auto xl:right-5 sm:-bottom-10"
+          phx-hook="ScrollToTop"
+        >
           <Icons.scroll_to_top_icon />
         </div>
       </div>

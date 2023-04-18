@@ -725,22 +725,20 @@ defmodule InstacampWeb.Components.Icons do
   @spec scroll_to_top_icon(assigns()) :: render()
   def scroll_to_top_icon(assigns) do
     ~H"""
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 19V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="z-50 cursor-pointer text-indigo-500 dark:text-gray-400"
+    >
       <path
-        d="M6 12L11.9507 5.02486C11.9789 4.99171 12.0211 4.99171 12.0494 5.02486L18 12"
-        stroke="currentColor"
-        stroke-width="1.4"
-        stroke-linecap="round"
-      />
-      <rect
-        x="1.45996"
-        y="1.5"
-        width="21.08"
-        height="21"
-        stroke-width="1.4"
-        rx="2"
-        stroke="currentColor"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M14.0001 27.3332C21.3639 27.3332 27.3334 21.3636 27.3334 13.9998C27.3334 6.63604 21.3639 0.666504 14.0001 0.666504C6.63628 0.666504 0.666748 6.63604 0.666748 13.9998C0.666748 21.3636 6.63628 27.3332 14.0001 27.3332ZM14.7072 7.9594L20.0405 13.2927C20.431 13.6832 20.431 14.3164 20.0405 14.7069C19.65 15.0974 19.0168 15.0974 18.6263 14.7069L15 11.0806V19.3332C15 19.8855 14.5523 20.3332 14 20.3332C13.4477 20.3332 13 19.8855 13 19.3332V11.0808L9.37385 14.7069C8.98333 15.0974 8.35016 15.0974 7.95964 14.7069C7.56912 14.3164 7.56912 13.6832 7.95964 13.2927L13.2845 7.96785C13.3175 7.93406 13.3529 7.90259 13.3904 7.87372C13.4454 7.83134 13.5037 7.79546 13.5644 7.76609C13.6961 7.70228 13.8439 7.6665 14 7.6665C14.0008 7.6665 14.0016 7.6665 14.0023 7.66651C14.122 7.66678 14.2368 7.68808 14.3431 7.72691C14.476 7.77532 14.6006 7.85281 14.7072 7.9594Z"
+        fill="currentColor"
+        fill-opacity="0.64"
       />
     </svg>
     """
