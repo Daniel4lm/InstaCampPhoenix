@@ -817,7 +817,7 @@ defmodule InstacampWeb.CoreComponents do
     JS.hide(js,
       to: "##{selector}",
       time: 200,
-      transition: "transition ease-out duration-200 opacity-0 transform scale-90"
+      transition: "transition ease-out duration-200 opacity-0"
     )
   end
 

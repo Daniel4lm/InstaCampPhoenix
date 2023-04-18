@@ -13,12 +13,10 @@ defmodule InstacampWeb.FeatureCase do
   using do
     quote do
       use Wallaby.Feature
+      # use Wallaby.DSL
 
       import InstacampWeb.FeatureCase
       import Wallaby.Query
-
-      # use Wallaby.DSL
-      alias InstacampWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
       @endpoint InstacampWeb.Endpoint
@@ -83,7 +81,6 @@ defmodule InstacampWeb.FeatureCase do
 
     session
     |> Browser.visit("/dev/mailbox")
-    |> wait(4000)
     |> Browser.all(list_group_item)
     |> List.first()
     |> Element.click()
