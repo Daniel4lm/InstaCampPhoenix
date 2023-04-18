@@ -184,6 +184,7 @@ defmodule InstacampWeb.CoreComponents do
       </.mobile_menu>
   """
   attr(:class, :string, default: nil)
+  attr(:title, :string, default: "Campy")
   slot(:inner_block, required: true)
 
   @spec mobile_menu(map()) :: Phoenix.LiveView.Rendered.t()
@@ -197,8 +198,8 @@ defmodule InstacampWeb.CoreComponents do
       <div
         id="mobile-modal-content"
         class={@class}
-        phx-click-away={JS.dispatch("click", to: "#mobile-menu-close")}
-        phx-window-keydown={JS.dispatch("click", to: "#mobile-menu-close")}
+        phx-click-away={hide_mobile_menu()}
+        phx-window-keydown={hide_mobile_menu()}
         phx-key="escape"
       >
         <a
@@ -210,7 +211,7 @@ defmodule InstacampWeb.CoreComponents do
           <Icons.close />
         </a>
 
-        <h4 class="text-xl font-semibold m-3">Campy</h4>
+        <h4 class="text-xl font-semibold ml-6 my-3"><%= @title %></h4>
 
         <%= render_slot(@inner_block) %>
       </div>
