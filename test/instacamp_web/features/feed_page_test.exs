@@ -25,7 +25,7 @@ defmodule InstacampWeb.Features.FeedPageTest do
         password: "Damirs_password"
       )
 
-    _post_1 =
+    post_1 =
       blog_post_fixture(
         %Posts.Post{},
         user_1,
@@ -81,13 +81,14 @@ defmodule InstacampWeb.Features.FeedPageTest do
       |> visit_login_path()
       |> log_in_user("john@mail.org", "Valid_password")
 
-    %{sessions: session, user_1: user_1, user_2: user_2}
+    %{sessions: session, user_1: user_1, user_2: user_2, post: post_1}
   end
 
   feature "user visits root path, renders list of posts", %{
     session: session,
     user_1: _user_1,
-    user_2: _user_2
+    user_2: _user_2,
+    post: post
   } do
     session
     |> assert_text("Welcome back!")
@@ -111,7 +112,7 @@ defmodule InstacampWeb.Features.FeedPageTest do
     |> assert_has(Query.css("[id^='feed-item-']", count: 2))
     |> assert_text("Elixir and Phoenix web development")
     |> assert_text("Super Simple Start with Elixir")
-    |> click(Query.css("[id^='feed-item-']", text: "Elixir and Phoenix web development"))
+    |> open_post_page(post)
     |> assert_has(Query.css("#post-tags"))
     |> assert_text("#elixir")
     |> click(Query.text("#elixir"))
