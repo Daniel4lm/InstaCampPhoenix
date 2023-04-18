@@ -8,8 +8,15 @@ defmodule InstacampWeb.SettingsLive.Components.FollowComponent do
   alias InstacampWeb.TopicHelper
 
   @impl Phoenix.LiveComponent
-  def update(assigns, socket) do
-    user_follow = Accounts.get_following(assigns.current_user.id, assigns.user.id)
+  def update(%{current_user: nil} = assigns, socket) do
+    {:ok,
+     socket
+     |> assign(:state_text, "Follow")
+     |> assign(assigns)}
+  end
+
+  def update(%{current_user: current_user, user: user} = assigns, socket) do
+    user_follow = Accounts.get_following(current_user.id, user.id)
 
     {:ok,
      socket
@@ -25,7 +32,34 @@ defmodule InstacampWeb.SettingsLive.Components.FollowComponent do
   end
 
   @impl Phoenix.LiveComponent
-  def render(assigns) do
+  def render(%{current_user: nil} = assigns) do
+    ~H"""
+    <div class="my-2">
+      <.link
+        href={~p"/auth/login"}
+        class="py-1 px-5 border-none shadow rounded-full text-gray-50 hover:bg-light-blue-600 bg-light-blue-500"
+      >
+        <%= @state_text %>
+      </.link>
+    </div>
+    """
+  end
+
+  def render(%{current_user: current_user, user: user} = assigns)
+      when current_user.id == user.id do
+    ~H"""
+    <div class="my-2">
+      <.link
+        patch={~p"/accounts/edit"}
+        class="py-1 px-4 border-2 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-inherit"
+      >
+        Edit Profile
+      </.link>
+    </div>
+    """
+  end
+
+  def render(%{current_user: _current_user} = assigns) do
     ~H"""
     <button
       id="follow-component"
