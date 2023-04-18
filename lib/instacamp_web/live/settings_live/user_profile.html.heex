@@ -1,8 +1,8 @@
-<header class="relative flex justify-center items-center flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t md:border dark:border-none w-full md:rounded-2xl md:shadow-md md:shadow-slate-100 dark:shadow-none md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 pt-10 mt-10 pb-4">
+<header class="relative flex justify-center items-center flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t md:border dark:border-none w-full md:rounded-2xl md:shadow-md md:shadow-slate-100 dark:shadow-none md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto md:px-10 pt-10 mt-10 pb-4">
   <div class="w-full mb-4">
     <%= img_tag(@user.avatar_url,
       class:
-        "w-20 h-20 md:w-28 md:h-28 bg-white dark:bg-slate-400 border-4 border-indigo-200 dark:border-slate-300 p-[0.2rem] mx-auto -mt-20 rounded-full object-cover object-center"
+        "absolute xs:relative w-20 h-20 md:w-28 md:h-28 ml-4 xs:mx-auto -mt-20 bg-white dark:bg-slate-400 border-4 border-indigo-200 dark:border-slate-300 p-[0.2rem] rounded-full object-cover object-center"
     ) %>
   </div>
 
@@ -21,39 +21,32 @@
     />
   </.modal_dialog>
 
-  <section>
-    <div class="sm:absolute flex flex-col w- md:flex-row items-center md:justify-start px-3 pt-3 sm:top-2 sm:right-2">
-      <div class="my-2 md:my-0 md:ml-4">
-        <%= cond do %>
-          <% @current_user && @current_user.id == @user.id -> %>
-            <.link
-              patch={~p"/accounts/edit"}
-              class="py-1 px-4 border-2 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-inherit"
-            >
-              Edit Profile
-            </.link>
-          <% @current_user -> %>
-            <.live_component
-              current_user={@current_user}
-              id={@user.id}
-              module={FollowComponent}
-              user={@user}
-            />
-          <% true -> %>
-            <.link
-              href={~p"/auth/login"}
-              class="py-1 px-5 border-none shadow rounded-full text-gray-50 hover:bg-light-blue-600 bg-light-blue-500"
-            >
-              Follow
-            </.link>
-        <% end %>
-      </div>
+  <section class="w-full">
+    <div class="absolute flex flex-col md:flex-row items-center md:justify-start px-3 top-3 right-2">
+      <.live_component
+        current_user={@current_user}
+        id={@user.id}
+        module={FollowComponent}
+        user={@user}
+      />
     </div>
 
-    <div class="flex flex-col items-center p-3">
-      <h2 class="text-xl md:text-2xl font-semibold my-2">
-        <%= @user.full_name %>
-      </h2>
+    <div class="flex flex-col xs:items-center p-4">
+      <div class="flex items-center gap-2 md:flex-col">
+        <h2 class="text-xl md:text-2xl font-semibold my-2">
+          <%= @user.full_name %>
+        </h2>
+        <.link
+          :if={is_map_key(@user, :website) && @user.website}
+          href={@user.website}
+          target="_blank"
+          rel="noreferrer"
+          class="flex items-center justify-center my-1 px-2 py-1 text-sm xs:text-base rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
+        >
+          <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.globe_icon /></div>
+          <span class="font-medium mr-1"><%= display_website_uri(@user.website) %></span>
+        </.link>
+      </div>
       <p class="max-w-full break-words my-2">
         <%= if @user.bio do %>
           <%= @user.bio %>
@@ -61,19 +54,9 @@
           No bio found
         <% end %>
       </p>
-      <.link
-        :if={is_map_key(@user, :website) && @user.website}
-        href={@user.website}
-        target="_blank"
-        rel="noreferrer"
-        class="flex justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
-      >
-        <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.globe_icon /></div>
-        <span class="font-medium mr-1"><%= display_website_uri(@user.website) %></span>
-      </.link>
     </div>
 
-    <ul class="flex justify-center flex-wrap gap-2 md:gap-8 p-0 text-sm md:text-base">
+    <ul class="flex xs:justify-center flex-wrap gap-2 xs:gap-8 px-4 xs:p-0 text-sm md:text-base">
       <li
         :if={@user.location}
         id="profile-posts-count"
@@ -83,44 +66,42 @@
         <span>Location <b><%= @user.location %></b></span>
       </li>
 
-      <div class="flex justify-center flex-wrap gap-2 md:gap-8">
-        <.link patch={~p"/user/#{@user.username}/followers"}>
-          <li
-            class="flex items-center justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
-            id="profile-followers-count"
-          >
-            <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
-            <span>Followers <b><%= @user.followers_count %></b></span>
-          </li>
-        </.link>
+      <.link patch={~p"/user/#{@user.username}/followers"}>
+        <li
+          class="flex items-center justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
+          id="profile-followers-count"
+        >
+          <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
+          <span>Followers <b><%= @user.followers_count %></b></span>
+        </li>
+      </.link>
 
-        <.link patch={~p"/user/#{@user.username}/following"}>
-          <li
-            class="flex items-center justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
-            id="profile-following-count"
-          >
-            <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
-            <span>Following <b><%= @user.following_count %></b></span>
-          </li>
-        </.link>
-      </div>
+      <.link patch={~p"/user/#{@user.username}/following"}>
+        <li
+          class="flex items-center justify-center my-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-500"
+          id="profile-following-count"
+        >
+          <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.user_icon /></div>
+          <span>Following <b><%= @user.following_count %></b></span>
+        </li>
+      </.link>
     </ul>
   </section>
 </header>
 
-<section class="flex justify-center items-center flex-col bg-white w- dark:bg-slate-600 text-gray-600 dark:text-slate-100 w-full md:rounded-xl border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-10 py-2 md:my-4">
+<section class="flex xs:justify-center xs:items-center flex-col bg-white dark:bg-slate-600 text-gray-600 dark:text-slate-100 w-full md:rounded-xl border-b md:border dark:border-none shadow-md dark:shadow-none shadow-slate-100 md:w-10/12 xl:w-3/4 2xl:w-3/6 mx-auto px-4 xs:px-10 py-2 md:my-4">
   <p class="text-md md:text-lg font-semibold my-2">Recent activity</p>
 
-  <ul class="flex justify-center flex-wrap p-2 text-sm md:text-base">
+  <ul class="flex xs:justify-center flex-wrap gap-x-8 md:p-2 text-sm md:text-base">
     <li class="flex items-center justify-center my-1" id="profile-posts-count">
       <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.post_icon /></div>
       <span>Posts <b><%= @user.posts_count %></b></span>
     </li>
-    <li class="flex items-center justify-center my-1 ml-8" id="profile-comments-count">
+    <li class="flex items-center justify-center my-1 " id="profile-comments-count">
       <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.comment_icon /></div>
       <span>Comments <b><%= @comments_count %></b></span>
     </li>
-    <li class="flex items-center justify-center my-1 ml-8" id="profile-taged-count">
+    <li class="flex items-center justify-center my-1 " id="profile-taged-count">
       <div class="text-indigo-500 dark:text-blue-400 mr-1"><Icons.taged_icon /></div>
       <span>Taged posts <b><%= @bookmarks_count %></b></span>
     </li>
