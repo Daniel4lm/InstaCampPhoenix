@@ -14,6 +14,7 @@ defmodule InstacampWeb.PostLive.Show do
   alias InstacampWeb.CoreComponents
   alias InstacampWeb.Endpoint
   alias InstacampWeb.PostLive.EditComment
+  alias InstacampWeb.PostLive.SideNav
   alias InstacampWeb.TopicHelper
   alias Phoenix.LiveView.JS
   alias Phoenix.Socket.Broadcast
@@ -38,6 +39,7 @@ defmodule InstacampWeb.PostLive.Show do
       |> assign(:is_taged?, Posts.is_bookmarked(user_post, user))
       |> assign(:bookmarks_count, Posts.count_post_bookmarks(user_post))
       |> assign_comments()
+      |> assign(:side_nav_items, [])
       |> assign(:page_title, user_post.title)
       |> set_load_more_comments(),
       temporary_assigns: [post_comments: []]
@@ -171,6 +173,10 @@ defmodule InstacampWeb.PostLive.Show do
      |> update(:comments_page, fn page -> page + 1 end)
      |> assign(:load_more_comments_btn, more_comments_btn)
      |> assign_comments()}
+  end
+
+  def handle_event("side_nav_items", %{"side_items" => post_sections}, socket) do
+    {:noreply, assign(socket, :side_nav_items, post_sections)}
   end
 
   @impl Phoenix.LiveView

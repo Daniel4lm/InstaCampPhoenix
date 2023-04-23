@@ -10,12 +10,11 @@
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.0/dist/trix.css" />
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js">
     </script>
-    <link phx-track-static rel="stylesheet" href={~p"/assets/vendor/fonts/InterWeb/inter.css"} />
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class={"scroll-smooth bg-main-background antialiased #{if(assigns[:theme_mode], do: @theme_mode, else: "")}"}>
+  <body class={"bg-main-background antialiased #{if(assigns[:theme_mode], do: @theme_mode, else: "")}"}>
     <%= @inner_content %>
   </body>
 </html>

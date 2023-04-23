@@ -80,7 +80,7 @@ defmodule InstacampWeb.UserAuthLive.UserSignUp do
                   "w-full rounded p-2 border-gray-300 dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 shadow-sm text-sm md:text-base focus:ring-2 focus:ring-indigo-500 dark:focus:border-transparent dark:focus:ring-blue-400 focus:ring-opacity-90 focus:border-transparent"
               ) %>
               <div
-                class="absolute w-6 h-6 top-1/2 right-2 -translate-y-1/2 text-gray-400 cursor-pointer"
+                class="absolute w-5 h-max top-1/2 right-2 -translate-y-1/2 text-gray-400 cursor-pointer"
                 id="user-registration-show-password"
                 phx-hook="InputShowPassword"
                 data-input-id={input_id(f, :password)}
