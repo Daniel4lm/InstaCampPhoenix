@@ -32,32 +32,40 @@ defmodule InstacampWeb.Navigation.NavbarTest do
       }
     end
 
-    test "user can see and use navigation bar", %{conn: conn} do
+    test "user can see and use navigation bar", %{conn: conn, user: user} do
       {:ok, home_live, html} = live(conn, Routes.feed_path(conn, :index))
 
       assert html =~ "Campy"
       refute html =~ "Log In"
 
-      assert has_element?(home_live, "#search-posts-form")
+      assert has_element?(home_live, "#navbar-search-form")
       assert has_element?(home_live, "#new-post")
       refute has_element?(home_live, "#post-search-list")
 
       assert home_live
-             |> form("#search-posts-form", %{post_term: "Someday"})
+             |> form("#navbar-search-form", %{search_term: "Someday"})
              |> render_change()
 
       assert has_element?(home_live, "#post-search-list")
       assert render(home_live) =~ "No results found."
 
       assert home_live
-             |> form("#search-posts-form", %{post_term: "Some"})
+             |> form("#navbar-search-form", %{search_term: "Some"})
              |> render_change()
 
       [post] = Posts.search_posts_by_term("Some")
 
-      updated_live = render(home_live)
-      assert updated_live =~ post.title
-      assert updated_live =~ post.user.full_name
+      u_l_1 = render(home_live)
+      assert u_l_1 =~ post.title
+      assert u_l_1 =~ post.user.full_name
+
+      assert home_live
+             |> form("#navbar-search-form", %{search_term: "dan"})
+             |> render_change()
+
+      u_l_2 = render(home_live)
+      assert u_l_2 =~ user.username
+      assert u_l_2 =~ user.full_name
     end
   end
 end
