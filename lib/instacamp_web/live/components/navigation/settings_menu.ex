@@ -4,7 +4,6 @@ defmodule InstacampWeb.Components.Navigation.SettingsMenu do
   use InstacampWeb, :html
 
   alias Instacamp.FileHandler
-  alias InstacampWeb.CoreComponents
   alias Phoenix.LiveView.JS
 
   @type assigns :: map()
@@ -36,7 +35,7 @@ defmodule InstacampWeb.Components.Navigation.SettingsMenu do
         }
         class="w-8 cursor-pointer"
       >
-        <CoreComponents.user_avatar
+        <.user_avatar
           src={FileHandler.get_avatar_thumb(@current_user.avatar_url)}
           class="w-8 h-8 hover:border-indigo-300 hover:ring-2 dark:hover:ring-0 hover:ring-indigo-300 hover:ring-opacity-80"
         />

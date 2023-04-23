@@ -75,7 +75,7 @@
     <section
       id="posts-feed"
       phx-update="stream"
-      class="w-full md:w-2/3 xl:w-full mb-4 space-y-2 flex flex-col"
+      class="w-full md:w-2/3 xl:w-full mb-4 space-y-4 flex flex-col"
       phx-hook="ResetFeedHook"
     >
       <div :for={{posts_feed_id, post} <- @streams.post_feed} id={posts_feed_id}>

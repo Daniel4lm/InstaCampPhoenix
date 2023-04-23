@@ -5,7 +5,6 @@ defmodule InstacampWeb.PostListLive.SavedListComponents do
 
   alias Instacamp.DateTimeHelper
   alias Instacamp.Posts
-  alias InstacampWeb.CoreComponents
 
   @spec saved_list_component(map()) :: Phoenix.LiveView.Rendered.t()
   def saved_list_component(assigns) do
@@ -32,7 +31,7 @@ defmodule InstacampWeb.PostListLive.SavedListComponents do
     >
       <div class="flex">
         <div class="my-3">
-          <CoreComponents.user_avatar
+          <.user_avatar
             with_link={~p"/user/#{@post.user.username}"}
             src={@post.user.avatar_url}
             class="w-8 h-8"

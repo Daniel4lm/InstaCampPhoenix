@@ -11,7 +11,6 @@ defmodule InstacampWeb.PostLive.Show do
   alias InstacampWeb.Components.Posts.CommentComponent
   alias InstacampWeb.Components.Posts.LikeComponent
   alias InstacampWeb.Components.Posts.TagComponent
-  alias InstacampWeb.CoreComponents
   alias InstacampWeb.Endpoint
   alias InstacampWeb.PostLive.EditComment
   alias InstacampWeb.PostLive.SideNav
