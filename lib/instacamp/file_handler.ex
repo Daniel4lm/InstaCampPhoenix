@@ -13,7 +13,11 @@ defmodule Instacamp.FileHandler do
 
   @spec maybe_upload_image(socket(), String.t(), atom(), String.t()) :: String.t() | nil
   def maybe_upload_image(socket, upload_directory_path, resource, old_file_name) do
-    if !File.exists?(upload_directory_path), do: File.mkdir!(upload_directory_path)
+    real_path = Application.app_dir(:instacamp, upload_directory_path)
+
+    if !File.exists?(real_path) do
+      File.mkdir!(real_path)
+    end
 
     image_filename = get_filename(socket, resource)
 
