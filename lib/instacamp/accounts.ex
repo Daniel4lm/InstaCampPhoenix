@@ -82,6 +82,23 @@ defmodule Instacamp.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  @doc """
+  Returns the list of users searched by term.
+
+  ## Examples
+
+      iex> search_users_by_term("John")
+      [%User{}, ...]
+
+  """
+  def search_users_by_term(term) do
+    User
+    |> where([user], ilike(user.full_name, ^"%#{term}%") or ilike(user.username, ^"%#{term}%"))
+    |> select([user], user)
+    # |> preload([:user])
+    |> Repo.all()
+  end
+
   ## User registration
 
   @doc """
