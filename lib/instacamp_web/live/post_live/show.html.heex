@@ -1,6 +1,6 @@
-<div class="flex sm:w-full xl:w-3/4 2xl:w-2/3 md:mx-auto overflow-hidden max-h-screen sm:px-4">
+<div class="relative flex sm:w-full lg:w-4/5 xl:w-3/4 md:mx-auto sm:px-4 md:px-0">
   <aside
-    class="fixed w-full sm:w-max z-[10] left-0 bottom-0 mr-1 border-t border-gray-300 dark:text-slate-100 rounded-lg bg-white dark:bg-slate-700 sm:border-0 sm:bg-transparent sm:p-6 sm:relative"
+    class="fixed sm:sticky w-full sm:w-max h-max z-[10] left-0 bottom-0 sm:left-auto sm:top-14 sm:p-6 sm:mr-1 border-t border-gray-300 dark:text-slate-100 rounded-lg bg-white dark:bg-slate-700 sm:border-0 sm:bg-transparent"
     aria-label="Post actions"
   >
     <div class="flex justify-around sm:flex-col">
@@ -178,28 +178,30 @@
       class="flex flex-col bg-white dark:bg-slate-600 dark:text-slate-100 border-t border-b sm:border border-[#d1d9d1] dark:border-0 sm:rounded-lg mb-4 py-6"
     >
       <header class="mx-4 sm:mx-12 my-2">
-        <div class="flex items-center ">
-          <CoreComponents.user_avatar
-            with_link={~p"/user/#{@post.user.username}"}
-            src={FileHandler.get_avatar_thumb(@post.user.avatar_url)}
-            class="w-10 h-10"
-          />
-          <div class="flex-1 ml-4">
-            <.link navigate={~p"/user/#{@post.user.username}"} class="font-bold">
-              <%= @post.user.full_name %>
-            </.link>
-            <p class="flex text-[0.9em] gap-1">
-              Posted on
-              <time
-                datetime={@post.updated_at}
-                class="date-no-year"
-                title={DateTimeHelper.format_post_date(@post.updated_at)}
-              >
-                <%= DateTimeHelper.format_post_date(@post.updated_at) %>
-              </time>
-            </p>
+        <div class="flex flex-col xs:flex-row xs:items-center ">
+          <div class="flex items-center flex-1">
+            <CoreComponents.user_avatar
+              with_link={~p"/user/#{@post.user.username}"}
+              src={FileHandler.get_avatar_thumb(@post.user.avatar_url)}
+              class="w-10 h-10"
+            />
+            <div class="flex-1 ml-4">
+              <.link navigate={~p"/user/#{@post.user.username}"} class="font-bold">
+                <%= @post.user.full_name %>
+              </.link>
+              <p class="flex text-sm md:text-base gap-1">
+                Posted on
+                <time
+                  datetime={@post.updated_at}
+                  class="date-no-year"
+                  title={DateTimeHelper.format_post_date(@post.updated_at)}
+                >
+                  <%= DateTimeHelper.format_post_date(@post.updated_at) %>
+                </time>
+              </p>
+            </div>
           </div>
-          <span class="text-gray-500 dark:text-gray-100 text-sm lg:text-base">
+          <span class="text-gray-500 pt-2 dark:text-gray-100 text-sm lg:text-base">
             Reading time • <%= Posts.calculate_read_time(@post) %> min
           </span>
         </div>
@@ -217,14 +219,18 @@
 
       <div
         :if={@post.photo_url}
-        class="max-w-[44rem] 2xl:max-w-3xl mx-auto px-4 sm:px-12 lg:px-0 my-8 rounded-lg overflow-hidden"
+        class="max-w-[44rem] 2xl:max-w-3xl mx-auto px-4 sm:px-12 xl:px-0 my-8 rounded-lg overflow-hidden"
       >
         <%= img_tag(@post.photo_url,
           class: "object-contain rounded-lg h-full"
         ) %>
       </div>
 
-      <div id="post-body" class="mx-4 sm:mx-12 py-4 text-sm md:text-base text-justify">
+      <div
+        id="post-body"
+        class="mx-4 sm:mx-12 py-4 text-sm md:text-base text-justify"
+        phx-hook="PostContentFormat"
+      >
         <%= raw(@post.body) %>
       </div>
 
@@ -267,7 +273,7 @@
                 <div class="flex flex-col">
                   <div class="lg:ml-4">
                     <%= hidden_input(f, :body, id: :body_input, phx_hook: "CommentBodyHook") %>
-                    <div id="trix-editor" class="" phx-update="ignore">
+                    <div id="trix-editor-comment" class="" phx-update="ignore">
                       <trix-editor
                         input="body_input"
                         class="min-h-[100px] rounded-lg border border-[#e0e2e4] dark:bg-slate-700 dark:text-slate-100 dark:border-slate-400 bg-inherit p-2 outline-none focus:ring-transparent focus:border-[#a6a8aa]"
@@ -329,4 +335,5 @@
       </div>
     </article>
   </div>
+  <SideNav.side_navigation :if={!Enum.empty?(@side_nav_items)} side_bar_links={@side_nav_items} />
 </div>
