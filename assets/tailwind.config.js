@@ -20,8 +20,8 @@ module.exports = {
         'show-tab-line': 'show-tab-line 0.4s ease-in-out forwards',
       },
       backgroundImage: {
-        'search-icon': "url('../images/search.svg')",
-        'search-icon-dark': "url('../images/search-dark.svg')",
+        'search-icon': "url('/images/search.svg')",
+        'search-icon-dark': "url('/images/search-dark.svg')",
       },
       boxShadow: {
         'card-shadow': '0px 0px 4px 0px rgb(219, 223, 227)',
