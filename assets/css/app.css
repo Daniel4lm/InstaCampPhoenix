@@ -2,6 +2,18 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@import "./fonts/inter.css";
+
+/* html {
+  scroll-behavior: smooth;
+} */
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 code {
   background: #f4f5f6;
   border-radius: 0.4rem;
@@ -50,8 +62,8 @@ h6 {
 }
 
 /* Alerts and form errors used by phx.new */
+
 .alert {
-  /* @apply w-max m-auto p-[15px] my-4 border border-transparent rounded-lg; */
   animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
 }
 
@@ -131,6 +143,7 @@ h6 {
 }
 
 /* Styles for handling buttons click events */
+
 .while-submitting {
   display: none;
 }
@@ -200,6 +213,10 @@ trix-editor > pre {
   @apply w-max p-1 my-1 italic mx-auto;
 }
 
+#side-nav-list a[aria-current="true"] {
+  @apply text-indigo-600 border-indigo-500 bg-indigo-50 rounded-tr-lg rounded-br-lg dark:text-inherit dark:border-slate-300 dark:bg-slate-500;
+}
+
 /* Trix editor */
 
 trix-editor:focus {
@@ -213,6 +230,16 @@ trix-editor::placeholder {
 trix-editor > ol,
 #post-body > ol {
   list-style: decimal inside;
+}
+
+trix-editor > h1,
+#post-body > h1 {
+  @apply text-[1.4rem] font-bold;
+}
+
+trix-editor > a,
+#post-body > .text-link {
+  @apply text-gray-600 dark:text-slate-100 font-bold text-base xs:text-xl md:text-2xl;
 }
 
 trix-editor blockquote,
@@ -233,6 +260,22 @@ trix-editor a,
   color: #3780ff;
   text-decoration: none;
   cursor: pointer;
+}
+
+#post-body .text-link {
+  @apply relative ml-4 md:ml-0;
+}
+
+#post-body .text-link:hover {
+  @apply relative;
+}
+
+#post-body .text-link::before {
+  @apply absolute content-['#'] text-slate-500 dark:text-slate-300 -left-[1.4em] top-full -translate-y-full text-base leading-3 invisible p-1 rounded-md border border-gray-400;
+}
+
+#post-body .text-link:hover::before {
+  @apply visible;
 }
 
 trix-editor > ul,
@@ -259,8 +302,30 @@ trix-toolbar .trix-button-group {
 }
 
 trix-toolbar .trix-button {
-  padding: 14px 0 !important;
   @apply text-justify border-b-0 dark:!border-transparent;
+}
+
+trix-toolbar .trix-button--icon {
+  @apply text-[8px] w-10 h-6 md:h-7 md:text-inherit;
+
+  max-width: calc(0.8em + 4vw);
+  text-indent: -9999px;
+}
+
+#trix-editor-comment .trix-button-group--file-tools {
+  display: none !important;
+}
+
+#trix-editor-comment .trix-button--icon-attach {
+  display: none !important;
+}
+
+#trix-editor-comment .trix-button--icon-increase-nesting-level {
+  display: none !important;
+}
+
+#trix-editor-comment .trix-button--icon-decrease-nesting-level {
+  display: none !important;
 }
 
 trix-toolbar .trix-button:hover {
@@ -331,48 +396,6 @@ trix-toolbar .trix-button.trix-active {
 
 .side-tooltip-text.tooltip-text-hover {
   @apply animate-[show-up-tooltip-side_0.8s_ease-in-out_forwards];
-}
-
-/* Animate comming soon page */
-#comming-soon-animation #smoke_b {
-  stroke: dimgrey;
-  stroke-dasharray: 52.81867599487305;
-  stroke-dashoffset: 52.81867599487305;
-  animation: dash 3s linear forwards infinite;
-}
-
-#comming-soon-animation #smoke_b2 {
-  stroke: darkgrey;
-  stroke-dasharray: 52.81867599487305;
-  stroke-dashoffset: 52.81867599487305;
-  animation: dash 4s linear forwards infinite;
-}
-
-#comming-soon-title {
-  animation: show-up-message 2s ease-in-out forwards;
-}
-
-@keyframes dash {
-  0% {
-    stroke-dashoffset: 52.81867599487305;
-  }
-  50% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -52.81867599487305;
-  }
-}
-
-@keyframes show-up-message {
-  0% {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  100% {
-    opacity: 0.8;
-    transform: translateY(0);
-  }
 }
 
 /*
