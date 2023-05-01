@@ -37,7 +37,7 @@ defmodule InstacampWeb.Components.Navigation.NotificationsComponent do
     <li id="notifications-comp" class=" ml-4 text-gray-600 dark:text-gray-200">
       <div
         id="notifications"
-        class="relative flex items-center justify-center flex-col md:flex-row cursor-pointer hover:text-indigo-400 dark:hover:text-inherit"
+        class="relative flex items-center justify-center flex-col cursor-pointer hover:text-gray-800 dark:hover:text-inherit"
         phx-hook="ToolTip"
         phx-click={
           JS.push("get_notifications", target: @myself)
@@ -55,8 +55,8 @@ defmodule InstacampWeb.Components.Navigation.NotificationsComponent do
             <span class="absolute rounded-full w-3 h-3 border-2 border-white bg-red-500 top-0 right-0" />
           <% end %>
         </div>
-        <span class="md:ml-1 font-semibold">Activity</span>
-        <span class="bottom-tooltip-text px-4 py-2 rounded-md bg-indigo-500 dark:bg-slate-500 text-white text-sm ">
+        <span>Activity</span>
+        <span class="bottom-tooltip-text px-4 py-2 rounded-md bg-indigo-500 dark:bg-slate-500 text-white text-sm">
           User notifications
         </span>
       </div>
@@ -66,7 +66,7 @@ defmodule InstacampWeb.Components.Navigation.NotificationsComponent do
         phx-click-away={close_menu("notifications-list")}
         phx-window-keydown={close_menu("notifications-list")}
         phx-key="escape"
-        class="hidden z-10 absolute bg-white dark:bg-slate-500 dark:text-slate-100 right-1/2 translate-x-1/2 md:translate-x-0 md:right-2 p-2 top-12 w-11/12 md:w-[46rem] lg:w-[56rem] border-2 border-slate-300 dark:border-slate-400 rounded-lg shadow-sm"
+        class="hidden z-10 absolute bg-white dark:bg-slate-500 dark:text-slate-100 right-1/2 translate-x-1/2 md:translate-x-0 md:right-2 p-2 top-16 w-11/12 md:w-[46rem] lg:w-[56rem] border-2 border-slate-300 dark:border-slate-400 rounded-lg shadow-sm"
       >
         <ul class="overflow-y-scroll min-h-96 max-h-[85vh]">
           <%= unless any_notification_today?(@notifications) do %>

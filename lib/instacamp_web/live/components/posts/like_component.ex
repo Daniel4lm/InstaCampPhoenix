@@ -34,15 +34,15 @@ defmodule InstacampWeb.Components.Posts.LikeComponent do
   def handle_event("toggle_like", _params, socket) do
     user = socket.assigns.current_user
     resource = socket.assigns.resource
-    resource_name = socket.assigns.resource_name
+    resource_type = socket.assigns.resource_name
 
     if is_liked?(user, resource) do
-      {:ok, _like} = Posts.unlike(user, resource_name, resource)
-      like_broadcast(resource_name, resource)
+      {:ok, _like} = Posts.unlike(user, resource_type, resource)
+      like_broadcast(resource, resource_type)
       {:noreply, assign(socket, :is_liked?, false)}
     else
-      {:ok, _like} = Posts.create_like(user, resource_name, resource)
-      like_broadcast(resource_name, resource)
+      {:ok, _like} = Posts.create_like(user, resource_type, resource)
+      like_broadcast(resource, resource_type)
       notify_broadcast(resource.user_id)
       {:noreply, assign(socket, :is_liked?, true)}
     end
@@ -57,27 +57,27 @@ defmodule InstacampWeb.Components.Posts.LikeComponent do
     )
   end
 
-  defp like_broadcast(:post, resource) do
+  defp like_broadcast(resource, :post) do
     updated_post = Posts.get_post!(resource.id)
 
     resource.id
     |> TopicHelper.post_or_comment_like_topic()
-    |> Endpoint.broadcast("like_post", %{post: updated_post})
+    |> Endpoint.broadcast("like_post", %{likes_count: updated_post.total_likes})
 
     resource.user_id
     |> TopicHelper.user_posts_topic()
     |> Endpoint.broadcast("like_post", %{post: updated_post})
   end
 
-  defp like_broadcast(:comment, resource) do
+  defp like_broadcast(resource, :comment) do
     resource.post_id
     |> TopicHelper.post_or_comment_like_topic()
     |> Endpoint.broadcast("like_post_comment", %{comment_id: resource.id})
   end
 
   defp is_liked?(user, resource) do
-    Enum.any?(resource.likes, fn like ->
-      like.user_id == user.id
-    end)
+    resource.id
+    |> Posts.get_resource_likes()
+    |> Enum.any?(fn like -> like.user_id == user.id end)
   end
 end

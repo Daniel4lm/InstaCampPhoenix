@@ -86,7 +86,7 @@ defmodule InstacampWeb.Features.FeedPageTest do
 
   feature "user visits root path, renders list of posts", %{
     session: session,
-    user_1: _user_1,
+    user_1: user_1,
     user_2: _user_2,
     post: post
   } do
@@ -127,5 +127,17 @@ defmodule InstacampWeb.Features.FeedPageTest do
     |> visit("/?with_comments=true")
     |> assert_has(Query.css("[id^='feed-item-']", count: 0))
     |> assert_text("Empty list or no results match this query!")
+    |> assert_has(Query.css("#posts-search-input"))
+    |> fill_in(Query.css(~s([id="posts-search-input"])), with: "elixir")
+    |> assert_has(Query.css("#clear-form-btn"))
+    |> assert_has(Query.css("#post-search-list"))
+    |> assert_text("Posts:")
+    |> assert_text("Super Simple Start with Elixir")
+    |> assert_text("Elixir and Phoenix web development")
+    |> click(Query.css("#clear-form-btn"))
+    |> assert_has(Query.css(~s([id="posts-search-input"]), text: ""))
+    |> fill_in(Query.css(~s([id="posts-search-input"])), with: "john")
+    |> assert_text("Users:")
+    |> assert_text(user_1.full_name)
   end
 end

@@ -3,26 +3,25 @@ defmodule InstacampWeb.PostLive.Show do
 
   use InstacampWeb, :live_view
 
+  alias Instacamp.Comments
   alias Instacamp.DateTimeHelper
   alias Instacamp.FileHandler
   alias Instacamp.Posts
   alias Instacamp.Posts.Comment
   alias InstacampWeb.Components.Icons
   alias InstacampWeb.Components.Posts.CommentComponent
-  alias InstacampWeb.Components.Posts.LikeComponent
-  alias InstacampWeb.Components.Posts.TagComponent
   alias InstacampWeb.Endpoint
-  alias InstacampWeb.PostLive.EditComment
-  alias InstacampWeb.PostLive.SideNav
+  alias InstacampWeb.PostLive.Components.SidebarLeft
+  alias InstacampWeb.PostLive.Components.SidebarNav
+  alias InstacampWeb.PostLive.ManageComment
   alias InstacampWeb.TopicHelper
-  alias Phoenix.LiveView.JS
   alias Phoenix.Socket.Broadcast
 
   @impl Phoenix.LiveView
   def mount(%{"slug" => slug}, _session, socket) do
     user = if(socket.assigns[:current_user], do: socket.assigns.current_user, else: nil)
     user_post = Posts.get_post_by_slug!(slug)
-    comment_changeset = Posts.change_comment(%Comment{})
+    comment_changeset = Comments.change_comment(%Comment{})
 
     if connected?(socket) && user do
       topic_subscriptions(user.id, user_post.id)
@@ -36,7 +35,7 @@ defmodule InstacampWeb.PostLive.Show do
       |> assign(:comment_changeset, comment_changeset)
       |> assign(:post, user_post)
       |> assign(:is_taged?, Posts.is_bookmarked(user_post, user))
-      |> assign(:bookmarks_count, Posts.count_post_bookmarks(user_post))
+      |> assign_post_attrs(user_post)
       |> assign_comments()
       |> assign(:side_nav_items, [])
       |> assign(:page_title, user_post.title)
@@ -72,6 +71,13 @@ defmodule InstacampWeb.PostLive.Show do
       |> Endpoint.subscribe()
   end
 
+  defp assign_post_attrs(socket, post) do
+    socket
+    |> assign(:likes_count, post.total_likes)
+    |> assign(:comments_count, post.total_comments)
+    |> assign(:bookmarks_count, Posts.count_post_bookmarks(post))
+  end
+
   @impl Phoenix.LiveView
   def handle_params(params, url, socket) do
     {:noreply,
@@ -81,11 +87,19 @@ defmodule InstacampWeb.PostLive.Show do
   end
 
   defp apply_action(socket, :edit_comment, %{"id" => id}) do
-    comment = Posts.get_comment!(id)
+    comment = Comments.get_comment!(id)
 
     socket
     |> assign(:page_title, "Edit comment")
-    |> assign(:comment_changeset, Posts.change_comment(comment))
+    |> assign(:comment_changeset, Comments.change_comment(comment))
+    |> assign(:comment, comment)
+  end
+
+  defp apply_action(socket, :comment_reply, %{"id" => id}) do
+    comment = Comments.get_comment!(id)
+
+    socket
+    |> assign(:page_title, "Comment reply")
     |> assign(:comment, comment)
   end
 
@@ -97,40 +111,38 @@ defmodule InstacampWeb.PostLive.Show do
 
   def handle_event("save_comment", %{"comment" => comment_attrs} = _params, socket) do
     live_action = socket.assigns.live_action
+    user = socket.assigns.current_user
+    post = socket.assigns.post
 
     action_type = %{
       :show => :new,
-      :edit_comment => :edit
+      :edit_comment => :edit,
+      :comment_reply => :comment_reply
     }
 
     comment = if live_action == :show, do: %Comment{}, else: socket.assigns.comment
 
-    case Posts.create_or_update_comment(
+    case Comments.create_or_update_comment(
            comment,
-           socket.assigns.post,
-           socket.assigns.current_user,
+           post,
+           user,
            action_type[live_action],
            comment_attrs
          ) do
-      {:ok, comment} ->
+      {:ok, new_comment} ->
         socket.assigns.post.id
         |> TopicHelper.post_comment_topic()
-        |> Endpoint.broadcast("create_post_comment", %{comment: comment})
+        |> Endpoint.broadcast("create_post_comment", %{comment: new_comment})
 
         broadcast_on_update_post_comment(socket.assigns.post)
 
-        if action_type[live_action] == :new do
-          Endpoint.broadcast_from(
-            self(),
-            TopicHelper.user_notification_topic(socket.assigns.post.user_id),
-            "notify_user",
-            %{}
-          )
-        end
+        user_notify_id = get_user_notify_id(post, user, comment, action_type[live_action])
+
+        maybe_notify_user(user_notify_id)
 
         {:noreply,
          socket
-         |> assign(:comment_changeset, Posts.change_comment(%Comment{}))
+         |> assign(:comment_changeset, Comments.change_comment(%Comment{}))
          |> maybe_return_to_show_page(action_type[live_action])}
 
       {:error, _changeset} ->
@@ -139,8 +151,8 @@ defmodule InstacampWeb.PostLive.Show do
   end
 
   def handle_event("delete_comment", %{"id" => id}, socket) do
-    comment = Posts.get_comment!(id)
-    {:ok, _comment} = Posts.delete_comment(comment, socket.assigns.post)
+    comment = Comments.get_comment!(id)
+    {:ok, _comment} = Comments.delete_comment(comment, socket.assigns.post)
 
     socket.assigns.post.id
     |> TopicHelper.post_comment_topic()
@@ -183,41 +195,51 @@ defmodule InstacampWeb.PostLive.Show do
         %Broadcast{
           event: "create_post_comment",
           payload: %{comment: comment},
-          topic: "post_comments:" <> post_id
+          topic: "post_comments:" <> _post_id
         } = _message,
         socket
       ) do
     {:noreply,
      socket
-     |> assign(comments_section_update: "prepend")
+     |> assign(:comments_section_update, "prepend")
      |> update(:post_comments, fn comments -> [comment | comments] end)
-     |> update(:post, fn _post -> Posts.get_post!(post_id) end)}
+     |> update(:comments_count, &(&1 + 1))}
   end
 
   def handle_info(
         %Broadcast{
           event: "delete_post_comment",
           payload: %{comment: _comment},
-          topic: "post_comments:" <> post_id
+          topic: "post_comments:" <> _post_id
         } = _message,
         socket
       ) do
     {:noreply,
      socket
-     |> assign(comments_section_update: "replace")
+     |> assign(:comments_section_update, "replace")
      |> assign_comments()
-     |> update(:post, fn _post -> Posts.get_post!(post_id) end)}
+     |> update(:comments_count, &(&1 - 1))}
   end
 
   def handle_info(
         %Broadcast{
-          event: event_name,
-          payload: %{post: post}
-          # topic: "post:" <> _post_id
+          event: "like_post",
+          payload: %{likes_count: likes_count},
+          topic: "post_or_comment_likes:" <> _post_id
         },
         socket
-      )
-      when event_name in ["post_update", "like_post"] do
+      ) do
+    {:noreply, assign(socket, :likes_count, likes_count)}
+  end
+
+  def handle_info(
+        %Broadcast{
+          event: "post_update",
+          payload: %{post: post},
+          topic: "post:" <> _post_id
+        },
+        socket
+      ) do
     {:noreply, update(socket, :post, fn _post -> post end)}
   end
 
@@ -254,6 +276,30 @@ defmodule InstacampWeb.PostLive.Show do
     assign(socket, :post_comments, comments)
   end
 
+  defp get_user_notify_id(post, user, comment, action) do
+    cond do
+      action == :new && post.user_id != user.id ->
+        post.user_id
+
+      action == :comment_reply && comment.user_id != user.id ->
+        comment.user_id
+
+      true ->
+        nil
+    end
+  end
+
+  defp maybe_notify_user(nil), do: nil
+
+  defp maybe_notify_user(user_notify_id) do
+    Endpoint.broadcast_from(
+      self(),
+      TopicHelper.user_notification_topic(user_notify_id),
+      "notify_user",
+      %{}
+    )
+  end
+
   defp broadcast_on_update_post_comment(post) do
     post.user_id
     |> TopicHelper.user_posts_topic()
@@ -262,7 +308,7 @@ defmodule InstacampWeb.PostLive.Show do
 
   defp maybe_return_to_show_page(socket, :new), do: socket
 
-  defp maybe_return_to_show_page(socket, :edit),
+  defp maybe_return_to_show_page(socket, action) when action in [:edit, :comment_reply],
     do: push_navigate(socket, to: ~p"/post/#{socket.assigns.post.slug}")
 
   defp set_load_more_comments(socket) do

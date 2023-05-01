@@ -1,4 +1,4 @@
-defmodule InstacampWeb.PostLive.SideNav do
+defmodule InstacampWeb.PostLive.Components.SidebarNav do
   @moduledoc false
 
   use InstacampWeb, :html

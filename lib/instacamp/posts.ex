@@ -430,30 +430,19 @@ defmodule Instacamp.Posts do
     |> offset(^((page - 1) * per_page))
     |> order_by([comment], desc: comment.inserted_at)
     |> preload([:user, :post])
-    |> preload(likes: :user)
+    |> preload([:replies, likes: :user])
     |> Repo.all()
   end
 
   @doc """
-  Gets a single comment.
-
-  Raises `Ecto.NoResultsError` if the Comment does not exist.
+  Insert the list of post tags and returns the same list.
 
   ## Examples
 
-      iex> get_comment!(123)
-      %Comment{}
-
-      iex> get_comment!(456)
-      ** (Ecto.NoResultsError)
+      iex> insert_tags(tags)
+      [%Tag{}, ...]
 
   """
-  def get_comment!(id) do
-    Comment
-    |> Repo.get!(id)
-    |> Repo.preload([:user, :likes])
-  end
-
   def insert_tags(tags) do
     timestamp = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
 
@@ -480,137 +469,6 @@ defmodule Instacamp.Posts do
   end
 
   @doc """
-  Creates a new comment or updates an existing one.
-
-  ## Examples
-
-      iex> create_or_update_comment(comment, post, user, :new, %{field: value})
-      {:ok, %Comment{}}
-
-      iex> create_or_update_comment(comment, post, user, :new, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_or_update_comment(
-        %Comment{} = comment,
-        %Post{} = post,
-        %User{} = user,
-        action,
-        attrs \\ %{}
-      ) do
-    comment_changeset =
-      comment
-      |> Comment.changeset(attrs)
-      |> Ecto.Changeset.put_change(:user_id, user.id)
-      |> Ecto.Changeset.put_change(:post_id, post.id)
-
-    comments_transaction =
-      case action do
-        :new ->
-          build_comments_transaction(comment_changeset, :new, %{post: post})
-
-        :edit ->
-          build_comments_transaction(comment_changeset, :edit, %{})
-      end
-
-    case comments_transaction do
-      {:ok, result} ->
-        if action == :new do
-          comment_notification = build_comment_notification(result.comment, post, user)
-          Repo.insert(comment_notification)
-        end
-
-        {:ok, Repo.preload(result.comment, [[likes: [:user]], :post, :user])}
-
-      {:error, _failed_operation, changeset, _changes_so_far} ->
-        {:error, changeset}
-    end
-  end
-
-  defp build_comments_transaction(comment_changeset, :new, %{post: post} = _attrs) do
-    update_posts_with_comments_count = from(post in Post, where: post.id == ^post.id)
-
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(:comment, comment_changeset)
-    |> Ecto.Multi.update_all(:update_total_comments, update_posts_with_comments_count,
-      inc: [total_comments: 1]
-    )
-    |> Repo.transaction()
-  end
-
-  defp build_comments_transaction(comment_changeset, :edit, _attrs) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:comment, comment_changeset)
-    |> Repo.transaction()
-  end
-
-  defp build_comment_notification(resource, post, user) do
-    Notifications.create_comment_notification(resource, post, user)
-  end
-
-  @doc """
-  Deletes a comment.
-
-  ## Examples
-
-      iex> delete_comment(comment, post)
-      {:ok, %Comment{}}
-
-      iex> delete_comment(comment, post)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_comment(%Comment{} = comment, %Post{} = post) do
-    update_posts_with_comments_count = from(post in Post, where: post.id == ^post.id)
-    delete_comment_likes = from(like in Like, where: like.liked_id == ^comment.id)
-
-    comments_transaction =
-      Ecto.Multi.new()
-      |> Ecto.Multi.delete(:comment, comment)
-      |> Ecto.Multi.delete_all(:delete_comment_likes, delete_comment_likes)
-      |> Ecto.Multi.update_all(:update_total_comments, update_posts_with_comments_count,
-        inc: [total_comments: -1]
-      )
-      |> Repo.transaction()
-
-    case comments_transaction do
-      {:ok, result} ->
-        {:ok, result.comment}
-
-      {:error, _failed_operation, changeset, _changes_so_far} ->
-        {:error, changeset}
-    end
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking comment changes.
-
-  ## Examples
-
-      iex> change_comment(comment)
-      %Ecto.Changeset{data: %Comment{}}
-
-  """
-  def change_comment(%Comment{} = comment, attrs \\ %{}) do
-    Comment.changeset(comment, attrs)
-  end
-
-  @doc """
-  Returns the list of all users related to comments.
-
-  ## Examples
-
-      iex> get_users_from_comments([comment1, comment2, ...])
-      [%User{}, %User{}, ...]
-
-  """
-  def get_users_from_comments(post_comments) do
-    post_comments
-    |> Stream.uniq_by(fn %{user: %{id: id}} = _comment -> id end)
-    |> Enum.to_list()
-  end
-
-  @doc """
   Creates a like for Post or post comment.
 
   ## Examples
@@ -622,18 +480,18 @@ defmodule Instacamp.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_like(%User{} = user, resource_name, resource) do
+  def create_like(%User{} = user, resource_type, resource) do
     like_changeset =
       %Like{}
       |> Like.changeset(%{liked_id: resource.id})
       |> Ecto.Changeset.put_change(:user_id, user.id)
 
-    update_resource_with_total_likes = get_resource_query(resource_name, resource.id)
+    update_resource_with_total_likes = get_resource_query(resource_type, resource.id)
 
     like_transaction =
       Ecto.Multi.new()
       |> Ecto.Multi.insert(:like, like_changeset)
-      |> create_or_update_like_notification(user, resource, resource_name)
+      |> create_or_update_like_notification(user, resource, resource_type)
       |> Ecto.Multi.update_all(:update_total_likes, update_resource_with_total_likes,
         inc: [total_likes: 1]
       )
@@ -648,15 +506,17 @@ defmodule Instacamp.Posts do
     end
   end
 
-  defp create_or_update_like_notification(transaction, user, resource, resource_name) do
+  defp create_or_update_like_notification(transaction, user, resource, resource_type) do
     case Notifications.get_post_notification(user.id, resource) do
       nil ->
-        like_notification = build_like_notification(user, resource, resource_name)
+        like_notification = build_like_notification(user, resource, resource_type)
 
         Ecto.Multi.insert(transaction, :notification, like_notification)
 
-      last_like_notif ->
-        Ecto.Multi.update(transaction, :update_notification, last_like_notif, set: [read: false])
+      last_like_notification ->
+        Ecto.Multi.update(transaction, :update_notification, last_like_notification,
+          set: [read: false]
+        )
     end
   end
 
@@ -689,12 +549,12 @@ defmodule Instacamp.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def unlike(%User{} = user, resource_name, resource) do
-    like = get_like(user, resource)
+  def unlike(%User{} = user, resource_type, resource) do
+    like = get_like(user.id, resource.id)
 
-    update_resource_with_total_likes = get_resource_query(resource_name, resource.id)
+    update_resource_with_total_likes = get_resource_query(resource_type, resource.id)
 
-    like_notification = get_like_notification(user.id, resource, resource_name)
+    like_notification = get_like_notification(user.id, resource, resource_type)
 
     like_transaction =
       Ecto.Multi.new()
@@ -729,10 +589,16 @@ defmodule Instacamp.Posts do
   defp get_resource_query(:comment, liked_id),
     do: from(comment in Comment, where: comment.id == ^liked_id)
 
-  defp get_like(user, resource) do
-    Enum.find(resource.likes, fn resource ->
-      resource.user_id == user.id
-    end)
+  defp get_like(user_id, resource_id) do
+    Like
+    |> where([like], like.liked_id == ^resource_id and like.user_id == ^user_id)
+    |> Repo.one()
+  end
+
+  def get_resource_likes(resource_id) do
+    Like
+    |> where([like], like.liked_id == ^resource_id)
+    |> Repo.all()
   end
 
   @doc """

@@ -5,6 +5,7 @@ defmodule InstacampWeb.Components.Navigation.NavbarFormComponent do
 
   alias Instacamp.Accounts
   alias Instacamp.Posts
+  alias InstacampWeb.Components.Icons
 
   @impl Phoenix.LiveComponent
   def mount(socket) do
@@ -13,6 +14,7 @@ defmodule InstacampWeb.Components.Navigation.NavbarFormComponent do
      |> assign(:searched_posts, [])
      |> assign(:searched_users, [])
      |> assign(:while_searching?, false)
+     |> assign(:value, nil)
      |> assign(:results_not_found?, false)
      |> assign(:overflow_y_scroll_ul, "")}
   end
@@ -21,23 +23,42 @@ defmodule InstacampWeb.Components.Navigation.NavbarFormComponent do
   def render(assigns) do
     ~H"""
     <div class="relative hidden md:flex w-full md:w-2/5 mx-2">
-      <form id="navbar-search-form" class="w-full" phx-change="search_resources" phx-target={@myself}>
-        <input
-          id="posts-search-input"
-          phx-debounce="1000"
-          name="search_term"
-          type="search"
-          placeholder="Search posts or users"
-          autocomplete="off"
-          class="rounded-full w-full border dark:bg-slate-500 bg-search-icon dark:bg-search-icon-dark bg-no-repeat bg-[length:20px] bg-[right_0.8em_center] ring-0 duration-100 border-gray-400 focus:ring-2 focus:ring-indigo-400 dark:focus:ring-blue-400 focus:ring-opacity-90 focus:border-transparent dark:text-gray-200 pr-[2.4em] pl-[0.8em] py-[0.4em] text-base placeholder:font-light placeholder:text-slate-400 dark:placeholder:text-slate-300"
-        />
+      <form
+        id="navbar-search-form"
+        class="w-full"
+        phx-change="search_resources"
+        phx-submit="search_resources"
+        phx-target={@myself}
+      >
+        <div class="relative">
+          <input
+            id="posts-search-input"
+            phx-debounce="500"
+            name="search_term"
+            type="search"
+            placeholder="Search posts or users"
+            autocomplete="off"
+            value={@value}
+            phx-click={maybe_open_list(@myself, @value)}
+            phx-target={@myself}
+            class="rounded-full w-full border dark:bg-slate-500 bg-search-icon dark:bg-search-icon-dark bg-no-repeat bg-[length:20px] bg-[right_0.8em_center] ring-0 duration-100 border-gray-400 focus:ring-2 focus:ring-indigo-400 dark:focus:ring-blue-400 focus:ring-opacity-90 focus:border-transparent dark:text-gray-200 pr-[2.4em] pl-[0.8em] py-[0.4em] text-base placeholder:font-light placeholder:text-slate-400 dark:placeholder:text-slate-300"
+          />
+          <div
+            id="clear-form-btn"
+            class={"#{if(!is_nil(@value) && String.length(@value) > 0, do: "block", else: "hidden")} absolute text-gray-500 dark:text-slate-200 top-1/2 right-10 -translate-y-1/2 transition scale-80 p-1 rounded-full hover:bg-neutral-200 hover:dark:bg-slate-400"}
+            phx-click="clear_form"
+            phx-target={@myself}
+          >
+            <Icons.close />
+          </div>
+        </div>
       </form>
 
       <ul
         :if={@while_searching?}
         id="post-search-list"
-        phx-click-away={close_search_menu(@myself)}
-        phx-window-keydown={close_search_menu(@myself)}
+        phx-click-away={close_search_list(@myself)}
+        phx-window-keydown={close_search_list(@myself)}
         phx-key="escape"
         phx-target={@myself}
         class={
@@ -91,6 +112,15 @@ defmodule InstacampWeb.Components.Navigation.NavbarFormComponent do
   end
 
   @impl Phoenix.LiveComponent
+  def handle_event("search_resources", %{"search_term" => ""}, socket) do
+    {:noreply,
+     socket
+     |> assign(:value, "")
+     |> assign(:searched_posts, [])
+     |> assign(:searched_users, [])
+     |> assign(:results_not_found?, true)}
+  end
+
   def handle_event("search_resources", %{"search_term" => search_term}, socket) do
     posts = Posts.search_posts_by_term(search_term)
     users = Accounts.search_users_by_term(search_term)
@@ -102,6 +132,7 @@ defmodule InstacampWeb.Components.Navigation.NavbarFormComponent do
        socket
        |> assign(:searched_posts, [])
        |> assign(:searched_users, [])
+       |> assign(:value, search_term)
        |> assign(:while_searching?, true)
        |> assign(:results_not_found?, true)}
     else
@@ -113,20 +144,33 @@ defmodule InstacampWeb.Components.Navigation.NavbarFormComponent do
          socket
          |> assign(:searched_posts, posts)
          |> assign(:searched_users, users)
+         |> assign(:value, search_term)
          |> assign(:while_searching?, true)
          |> assign(:results_not_found?, false)
          |> assign(:overflow_y_scroll_ul, check_search_result(posts, users))}
     end
   end
 
-  def handle_event("hide_search_list", _params, socket) do
-    {:noreply, assign(socket, :while_searching?, false)}
+  def handle_event("clear_form", _params, socket), do: {:noreply, assign(socket, :value, "")}
+
+  def handle_event("hide_search_list", _params, socket),
+    do: {:noreply, assign(socket, while_searching?: false)}
+
+  def handle_event("show_search_list", _params, socket),
+    do: {:noreply, assign(socket, while_searching?: true)}
+
+  defp maybe_open_list(target, search_value) do
+    if !is_nil(search_value) && String.length(search_value) > 0 do
+      open_search_list(target)
+    end
   end
 
-  defp close_search_menu(js \\ %JS{}, target) do
-    js
-    |> JS.push("hide_search_list", target: target)
-    |> close_menu("post-search-list")
+  defp close_search_list(js \\ %JS{}, target) do
+    JS.push(js, "hide_search_list", target: target)
+  end
+
+  defp open_search_list(js \\ %JS{}, target) do
+    JS.push(js, "show_search_list", target: target)
   end
 
   defp check_search_result(found_posts, found_users) do

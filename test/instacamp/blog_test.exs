@@ -4,6 +4,7 @@ defmodule Instacamp.BlogTest do
   import Instacamp.AccountsFixtures
   import Instacamp.BlogFixtures
 
+  alias Instacamp.Comments
   alias Instacamp.Posts
   alias Instacamp.Repo
 
@@ -255,7 +256,7 @@ defmodule Instacamp.BlogTest do
     test "change_comment/2 returns valid changeset" do
       assert %Ecto.Changeset{} =
                post_comment_changeset =
-               Posts.change_comment(%Posts.Comment{}, %{
+               Comments.change_comment(%Posts.Comment{}, %{
                  "body" => "Hii. This is my first comment!"
                })
 
@@ -264,7 +265,8 @@ defmodule Instacamp.BlogTest do
 
     test "change_comment/2 returns invalid changeset" do
       assert %Ecto.Changeset{} =
-               post_comment_changeset = Posts.change_comment(%Posts.Comment{}, %{"body" => nil})
+               post_comment_changeset =
+               Comments.change_comment(%Posts.Comment{}, %{"body" => nil})
 
       refute post_comment_changeset.valid?
     end
@@ -276,7 +278,7 @@ defmodule Instacamp.BlogTest do
       second_user = user_fixture()
 
       assert {:ok, comment} =
-               Posts.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
+               Comments.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
                  "body" => "Hii. This is my first comment!"
                })
 
@@ -292,17 +294,17 @@ defmodule Instacamp.BlogTest do
       second_user = user_fixture()
 
       assert {:ok, _comment_1} =
-               Posts.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
+               Comments.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
                  "body" => "First comment!"
                })
 
       assert {:ok, _comment_2} =
-               Posts.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
+               Comments.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
                  "body" => "Second comment!"
                })
 
       assert {:ok, _comment_3} =
-               Posts.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
+               Comments.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
                  "body" => "Third comment!"
                })
 
@@ -322,7 +324,7 @@ defmodule Instacamp.BlogTest do
       comment: comment
     } do
       assert {:ok, updated_comment} =
-               Posts.create_or_update_comment(comment, post, user, :edit, %{
+               Comments.create_or_update_comment(comment, post, user, :edit, %{
                  "body" => "This is my second comment"
                })
 
@@ -335,10 +337,40 @@ defmodule Instacamp.BlogTest do
       user: _user,
       comment: comment
     } do
-      assert {:ok, deleted_comment} = Posts.delete_comment(comment, post)
+      assert {:ok, deleted_comment} = Comments.delete_comment(comment, post)
 
       assert deleted_comment.id == comment.id
-      assert_raise Ecto.NoResultsError, fn -> Posts.get_comment!(deleted_comment.id) end
+      assert_raise Ecto.NoResultsError, fn -> Comments.get_comment!(deleted_comment.id) end
+    end
+  end
+
+  describe "test reply to comments" do
+    setup [:create_blog_deps]
+
+    test "user reply to other comment", %{
+      post: post,
+      user: user,
+      comment: comment
+    } do
+      assert {:ok, reply_comment} =
+               Comments.create_or_update_comment(comment, post, user, :comment_reply, %{
+                 "body" => "This is a reply to this comment!"
+               })
+
+      updated_source_comment =
+        comment.id
+        |> Comments.get_comment!()
+        |> Repo.preload(:replies)
+
+      updated_reply_comment = Comments.get_comment!(reply_comment.id)
+
+      [comment_reply_from_source_comment] = updated_source_comment.replies
+
+      assert updated_source_comment.total_comments == 1
+      assert comment_reply_from_source_comment.parent_id == updated_source_comment.id
+      assert comment_reply_from_source_comment.id == reply_comment.id
+
+      assert reply_comment.parent_id == comment.id
     end
   end
 
@@ -352,12 +384,12 @@ defmodule Instacamp.BlogTest do
       second_user = user_fixture()
 
       assert {:ok, comment_1} =
-               Posts.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
+               Comments.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
                  "body" => "First comment!"
                })
 
       assert {:ok, comment_2} =
-               Posts.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
+               Comments.create_or_update_comment(%Posts.Comment{}, post, second_user, :new, %{
                  "body" => "Second comment!"
                })
 
@@ -371,7 +403,7 @@ defmodule Instacamp.BlogTest do
       assert {:ok, like_for_comment_1} = Posts.create_like(user, :comment, comment_1)
       assert {:ok, like_for_comment_2} = Posts.create_like(user, :comment, comment_2)
 
-      liked_comment_2 = Posts.get_comment!(like_for_comment_2.liked_id)
+      liked_comment_2 = Comments.get_comment!(like_for_comment_2.liked_id)
       assert liked_comment_2.total_likes == 1
 
       assert like_for_comment_1.liked_id == comment_1.id
@@ -380,7 +412,7 @@ defmodule Instacamp.BlogTest do
       assert like_for_comment_1.user_id == user.id
 
       assert {:ok, like_for_comment_2} = Posts.unlike(user, :comment, liked_comment_2)
-      unliked_comment_1 = Posts.get_comment!(like_for_comment_2.liked_id)
+      unliked_comment_1 = Comments.get_comment!(like_for_comment_2.liked_id)
       assert unliked_comment_1.total_likes == 0
     end
   end

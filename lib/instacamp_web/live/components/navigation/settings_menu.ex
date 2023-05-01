@@ -23,7 +23,7 @@ defmodule InstacampWeb.Components.Navigation.SettingsMenu do
   @spec menu(assigns()) :: render()
   def menu(assigns) do
     ~H"""
-    <li class="xs:relative ml-6">
+    <li class="xs:relative ml-4">
       <div
         id="user-avatar"
         phx-click={
@@ -33,12 +33,13 @@ defmodule InstacampWeb.Components.Navigation.SettingsMenu do
             out: "transition ease-out duration-200 opacity-0 transform scale-90"
           )
         }
-        class="w-8 cursor-pointer"
+        class="w-8 cursor-pointer flex items-center justify-center text-gray-600 flex-col dark:text-gray-200 hover:text-black"
       >
         <.user_avatar
           src={FileHandler.get_avatar_thumb(@current_user.avatar_url)}
-          class="w-8 h-8 hover:border-indigo-300 hover:ring-2 dark:hover:ring-0 hover:ring-indigo-300 hover:ring-opacity-80"
+          class="w-7 h-7 md:w-8 md:h-8 hover:border-indigo-300 hover:ring-2 dark:hover:ring-0 hover:ring-indigo-300 hover:ring-opacity-80"
         />
+        <span>Me</span>
       </div>
 
       <ul
@@ -46,7 +47,7 @@ defmodule InstacampWeb.Components.Navigation.SettingsMenu do
         phx-click-away={close_menu("settings-menu")}
         phx-window-keydown={close_menu("settings-menu")}
         phx-key="escape"
-        class="absolute hidden top-12 xs:top-10 w-[98%] xs:w-56 p-2 left-1 right-1 xs:left-auto md:-right-4 bg-white dark:bg-slate-600 dark:text-slate-100 border border-gray-300 dark:border-slate-400 rounded-md overflow-hidden text-sm"
+        class="absolute hidden top-16 xs:top-14 w-[98%] xs:w-56 p-2 left-1 right-1 xs:left-auto md:-right-4 bg-white dark:bg-slate-600 dark:text-slate-100 border border-gray-300 dark:border-slate-400 rounded-md overflow-hidden text-sm"
       >
         <li class="py-2 px-2 flex flex-col">
           <p class="my-2 text-[1.4em]"><%= @current_user.full_name %></p>

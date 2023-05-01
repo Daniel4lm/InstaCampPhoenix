@@ -3,6 +3,7 @@ defmodule InstacampWeb.Components.Posts.PostCardComponent do
 
   use InstacampWeb, :html
 
+  alias Instacamp.Comments
   alias Instacamp.DateTimeHelper
   alias Instacamp.FileHandler
   alias Instacamp.Posts
@@ -95,7 +96,7 @@ defmodule InstacampWeb.Components.Posts.PostCardComponent do
         <div class="flex items-center text-[0.9em]">
           <div class="flex items-center flex-wrap p-2">
             <div
-              :for={%{user: user} <- Posts.get_users_from_comments(@post.comment)}
+              :for={%{user: user} <- Comments.get_users_from_comments(@post.comment)}
               id="user-hover-item"
               class="relative hover-item w-max flex items-center first:mx-0 -ml-2"
               phx-hook="ToolTip"

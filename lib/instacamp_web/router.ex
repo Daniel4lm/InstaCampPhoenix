@@ -92,6 +92,7 @@ defmodule InstacampWeb.Router do
       live "/new/post", PostLive.Form, :new
       live "/edit/post/:id", PostLive.Form, :edit
       live "/post/:slug/comments/:id/edit", PostLive.Show, :edit_comment
+      live "/post/:slug/comments/:id/reply", PostLive.Show, :comment_reply
     end
   end
 

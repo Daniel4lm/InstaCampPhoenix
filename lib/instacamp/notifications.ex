@@ -15,7 +15,8 @@ defmodule Instacamp.Notifications do
     following_action: "following",
     post_like_action: "post_like",
     comment_action: "comment",
-    comment_like_action: "comment_like"
+    comment_like_action: "comment_like",
+    comment_reply_action: "comment_reply"
   }
 
   @doc """
@@ -83,6 +84,24 @@ defmodule Instacamp.Notifications do
     |> Ecto.Changeset.put_assoc(:post, post)
     |> Ecto.Changeset.put_assoc(:author, author)
     |> Ecto.Changeset.put_assoc(:user, post.user)
+    |> Ecto.Changeset.put_assoc(:comment, comment)
+  end
+
+  @doc """
+  Builds a notification for comment reply.
+
+  ## Examples
+
+      iex> create_comment_reply_notification(comment, post, author)
+      %Notification{}
+
+  """
+  def create_comment_reply_notification(%Comment{} = comment, %Post{} = post, %User{} = author) do
+    %Notification{}
+    |> Notification.changeset(%{action_type: @actions.comment_reply_action})
+    |> Ecto.Changeset.put_assoc(:post, post)
+    |> Ecto.Changeset.put_assoc(:author, author)
+    |> Ecto.Changeset.put_assoc(:user, comment.user)
     |> Ecto.Changeset.put_assoc(:comment, comment)
   end
 

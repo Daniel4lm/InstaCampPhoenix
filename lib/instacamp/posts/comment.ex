@@ -21,10 +21,13 @@ defmodule Instacamp.Posts.Comment do
   schema "post_comments" do
     field :body, :string
     field :total_likes, :integer, default: 0
+    field :total_comments, :integer, default: 0
     belongs_to :post, Post
     belongs_to :user, User
+    belongs_to :parent, Instacamp.Posts.Comment, foreign_key: :parent_id
 
     has_many :likes, Like, foreign_key: :liked_id
+    has_many :replies, Instacamp.Posts.Comment, foreign_key: :parent_id
     has_many :notification, Notification
 
     timestamps()
@@ -33,7 +36,7 @@ defmodule Instacamp.Posts.Comment do
   @spec changeset(t(), attrs()) :: changeset()
   def changeset(%__MODULE__{} = comment, attrs) do
     comment
-    |> cast(attrs, [:body, :total_likes])
+    |> cast(attrs, [:body, :total_comments, :total_likes])
     |> validate_required([:body, :total_likes])
   end
 end

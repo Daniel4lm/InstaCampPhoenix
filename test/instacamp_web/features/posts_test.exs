@@ -206,7 +206,7 @@ defmodule InstacampWeb.Features.PostsTest do
     |> click(Query.css("[id='notifications']"))
     |> assert_text(user_2.username <> " started following you")
     |> assert_text(user_2.username <> " liked your post")
-    |> click(Query.css("[id='notifications']"))
+    |> send_keys([:escape])
 
     session_2
     |> click(Query.css("[id='post-comment-icon']"))
@@ -223,7 +223,7 @@ defmodule InstacampWeb.Features.PostsTest do
     |> assert_text("My first comment")
     |> click(Query.css("[id='notifications']"))
     |> assert_text(user_2.username <> " commented on your post")
-    |> click(Query.css("[id='notifications']"))
+    |> send_keys([:escape])
 
     session_2
     |> click(Query.css("[id^='comments-option-']"))
@@ -268,9 +268,10 @@ defmodule InstacampWeb.Features.PostsTest do
     |> send_keys([:escape])
     |> assert_text("Following 0")
     |> click(Query.link("Elixir and Phoenix development"))
-    |> assert_has(Query.css("[id^='comment-']", count: 1))
+    |> assert_has(Query.css("[id^='comment-container-']", count: 1))
+    |> assert_has(Query.css("[id^='user-comment-']", count: 1))
     |> assert_has(Query.css("[id^='likes-count-for-']", text: "0 Likes"))
-    |> click(Query.css("[id^='like-component-']"))
+    |> click(Query.css("[id^='like-component-']", at: 0))
     |> assert_has(Query.css("[id^='likes-count-for-']", text: "1 Likes"))
 
     session_2
@@ -278,7 +279,7 @@ defmodule InstacampWeb.Features.PostsTest do
     |> assert_text("Following 1")
     |> click(Query.css("[id='notifications']"))
     |> assert_text(user_1.username <> " liked your comment")
-    |> click(Query.css("[id='notifications']"))
+    |> send_keys([:escape])
     |> assert_has(Query.css("[id^='post-card-']", count: 5))
     |> touch_down(Query.css("#infinite-scroll-marker"), 0, 0)
 
@@ -291,6 +292,11 @@ defmodule InstacampWeb.Features.PostsTest do
     |> click(Query.css("[id='post-comment-icon']"))
     |> assert_has(Query.text("Comments:"))
     |> assert_text("My edited comment")
+    |> assert_has(Query.css("[id^='likes-count-for-']", text: "1 Likes"))
+    |> click(Query.css("[id^='likes-count-for-']", at: 0))
+    |> assert_has(Query.css("[id^='users-list-for-']"))
+    |> hover(Query.css("[id^='user-hover-item']"))
+    |> assert_has(Query.text(user_1.username))
     |> click(Query.css("[id^='comments-option-']"))
     |> assert_text("Delete")
 
@@ -329,11 +335,50 @@ defmodule InstacampWeb.Features.PostsTest do
     session_1
     |> click(Query.link("Elixir and Phoenix development"))
     |> click(Query.css("[id='post-comment-icon']"))
+    |> click(Query.css("[id='notifications']"))
+    |> assert_has(
+      Query.css("[id^='notification-comment-']",
+        text: user_2.username <> " commented on your post",
+        count: 6
+      )
+    )
+    |> send_keys([:escape])
     |> assert_text("6 comments")
-    |> assert_has(Query.css("[id^='comment-']", count: 5))
+    |> assert_has(Query.css("[id^='user-comment-']", count: 5))
     |> touch_down(Query.css("#load-more-comments-btn"), 0, 0)
     |> assert_text("More comments")
     |> click(Query.css("#load-more-comments-btn"))
-    |> assert_has(Query.css("[id^='comment-']", count: 6))
+    |> assert_has(Query.css("[id^='user-comment-']", count: 6))
+
+    find(session_1, Query.css("[id^='user-comment-']", text: "My fourth comment"), fn comment ->
+      comment
+      |> assert_text("My fourth comment")
+      |> assert_has(Query.css("[id^='reply-to-comment-']", text: "Reply"))
+      |> click(Query.text("Reply"))
+    end)
+
+    find(session_1, Query.css("#change-comment-comp"))
+
+    session_1
+    |> wait(400)
+    |> assert_text("Reply to")
+    |> fill_in(Query.css(~s([input="comment_body"])), with: "My reply to the fourth comment")
+    |> wait(400)
+    |> click(Query.button("Save"))
+    |> assert_has(Query.text("My reply to the fourth comment", count: 1))
+    |> touch_down(Query.css("#load-more-comments-btn"), 0, 0)
+    |> assert_text("More comments")
+    |> click(Query.css("#load-more-comments-btn"))
+    |> assert_has(Query.css("[id^='reply-button-for-']", text: "1 Reply"))
+    |> click(Query.text("1 Reply"))
+    |> assert_has(Query.css("[id^='reply-list-for-']"))
+    |> assert_has(Query.text("My reply to the fourth comment", count: 2))
+
+    session_2
+    |> assert_has(Query.text("My reply to the fourth comment", count: 1))
+    |> assert_has(Query.css("[id^='user-comment-']", text: "My fourth comment"))
+    |> click(Query.css("[id='notifications']"))
+    |> assert_text(user_1.username <> " replied to your comment")
+    |> send_keys([:escape])
   end
 end

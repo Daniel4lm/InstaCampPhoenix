@@ -27,8 +27,8 @@ defmodule InstacampWeb.Components.Navigation.Navbar do
   @spec app_navbar(assigns()) :: render()
   def app_navbar(assigns) do
     ~H"""
-    <header class="h-14 border-b dark:border-transparent flex fixed top-0 w-full bg-white dark:bg-slate-600 dark:text-slate-100 z-50">
-      <div class="flex justify-between lg:justify-center items-center px-2 mx-auto w-full md:w-11/12 2xl:w-8/12">
+    <header class="h-16 border-b dark:border-transparent flex fixed top-0 w-full bg-white dark:bg-slate-600 dark:text-slate-100 z-50">
+      <div class="flex justify-between lg:justify-center items-center px-2 py-1 mx-auto w-full md:w-11/12 2xl:w-8/12">
         <div class="flex justify-center items-center gap-2 xs:gap-0">
           <div
             id="toggle-modile-menu"
@@ -51,19 +51,19 @@ defmodule InstacampWeb.Components.Navigation.Navbar do
         <.live_component id="navbar-form-comp" module={NavbarFormComponent} />
 
         <nav class="lg:w-3/5">
-          <ul class="flex items-center justify-end pl-2 text-xs sm:text-sm lg:text-base">
+          <ul class="flex items-center justify-end pl-2 text-xs sm:text-sm">
             <%= if @current_user do %>
               <.link navigate={~p"/"} id="home-icon">
-                <li class="hidden xs:flex items-center justify-center text-gray-600 flex-col md:flex-row dark:text-gray-200 hover:text-indigo-400">
+                <li class="hidden xs:flex items-center justify-center text-gray-600 flex-col dark:text-gray-200 hover:text-black">
                   <Icons.home_icon />
-                  <span class="md:ml-1 font-semibold">Home</span>
+                  <span>Home</span>
                 </li>
               </.link>
               <.link navigate={~p"/new/post"} id="new-post">
-                <li class="hidden xs:flex items-center justify-center ml-4 text-gray-600 flex-col md:flex-row dark:text-gray-200 hover:text-indigo-400">
+                <li class="hidden xs:flex items-center justify-center ml-4 text-gray-600 flex-col dark:text-gray-200 hover:text-black">
                   <Icons.new_icon />
-                  <span class="lg:ml-1 font-semibold hidden lg:block">New post</span>
-                  <span class="md:ml-1 font-semibold lg:hidden">Post</span>
+                  <span class="hidden lg:block">New post</span>
+                  <span class="lg:hidden">Post</span>
                 </li>
               </.link>
               <.live_component

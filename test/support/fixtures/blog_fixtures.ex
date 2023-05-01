@@ -4,6 +4,7 @@ defmodule Instacamp.BlogFixtures do
   """
 
   alias Instacamp.Accounts
+  alias Instacamp.Comments
   alias Instacamp.Posts
 
   @type bookmark :: Posts.Bookmark.t()
@@ -51,7 +52,7 @@ defmodule Instacamp.BlogFixtures do
         "body" => "I love this! Never really thought about how easy it would be to..."
       })
 
-    {:ok, comment} = Posts.create_or_update_comment(%Posts.Comment{}, post, user, :new, attrs)
+    {:ok, comment} = Comments.create_or_update_comment(%Posts.Comment{}, post, user, :new, attrs)
     comment
   end
 
